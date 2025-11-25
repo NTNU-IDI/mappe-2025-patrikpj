@@ -51,6 +51,20 @@ public class Author {
   }
 
   /**
+   * Creates a new Author with the given names and email.
+   *
+   * @param firstName the author's first name (cannot be null or blank)
+   * @param lastName  the author's last name (cannot be null or blank)
+   * @param email     the author's email (must be valid format)
+   * @throws IllegalArgumentException if any argument is null, blank, or invalid
+   */
+  public Author(String firstName, String lastName, String email) {
+    setFirstName(firstName);
+    setLastName(lastName);
+    setEmail(email);
+  }
+
+  /**
    * Sets timestamps before first save.
    */
   @PrePersist
@@ -67,31 +81,36 @@ public class Author {
     updatedAt = LocalDateTime.now();
   }
 
-  /**
-   * Creates a new Author with the given names and email.
-   *
-   * @param firstName the author's first name (cannot be null or blank)
-   * @param lastName  the author's last name (cannot be null or blank)
-   * @param email     the author's email (must be valid format)
-   * @throws IllegalArgumentException if any argument is null, blank, or invalid
-   */
-  public Author(String firstName, String lastName, String email) {
-    setFirstName(firstName);
-    setLastName(lastName);
-    setEmail(email);
-  }
+  // Getters
 
+  /**
+   * Returns the unique identifier of this author.
+   *
+   * @return the author ID
+   */
   public Long getId() {
     return id;
   }
 
+  /**
+   * Sets the unique identifier of this author.
+   *
+   * @param id the author ID
+   */
   public void setId(Long id) {
     this.id = id;
   }
 
+  /**
+   * Returns the first name of this author.
+   *
+   * @return the first name
+   */
   public String getFirstName() {
     return firstName;
   }
+
+  // Setters
 
   /**
    * Sets the author's first name.
@@ -106,6 +125,11 @@ public class Author {
     this.firstName = firstName;
   }
 
+  /**
+   * Returns the last name of this author.
+   *
+   * @return the last name
+   */
   public String getLastName() {
     return lastName;
   }
@@ -132,6 +156,11 @@ public class Author {
     return firstName + " " + lastName;
   }
 
+  /**
+   * Returns the email address of this author.
+   *
+   * @return the email
+   */
   public String getEmail() {
     return email;
   }
@@ -152,14 +181,31 @@ public class Author {
     this.email = email;
   }
 
+  /**
+   * Returns the creation timestamp.
+   *
+   * @return the creation date and time
+   */
   public LocalDateTime getCreatedAt() {
     return createdAt;
   }
 
+  /**
+   * Returns the last update timestamp.
+   *
+   * @return the last update date and time
+   */
   public LocalDateTime getUpdatedAt() {
     return updatedAt;
   }
 
+  // Overrides
+
+  /**
+   * Returns a string representation of this author.
+   *
+   * @return the author's full name and email
+   */
   @Override
   public String toString() {
     return firstName + " " + lastName + " (" + email + ")";

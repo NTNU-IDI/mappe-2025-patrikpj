@@ -21,5 +21,6 @@
 
     <!-- Entity mappings -->
     <mapping class="edu.ntnu.idi.idatt.model.Author"/>
+    <mapping class="edu.ntnu.idi.idatt.model.DiaryEntry"/>
   </session-factory>
 </hibernate-configuration>
