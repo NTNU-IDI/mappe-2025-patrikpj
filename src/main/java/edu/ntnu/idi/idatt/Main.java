@@ -23,11 +23,17 @@ public class Main {
     DiaryEntryRepository diaryEntryRepository = new DiaryEntryRepository();
 
     // Create and save a new author
-    Author author = new Author("John", "Doe", "john@example.com");
+    Author author;
     try {
+      author = new Author("John", "Doe", "JohnDoe@Example.com");
       authorRepository.save(author);
       System.out.println("Saved author: " + author);
+    } catch (IllegalArgumentException e) {
+      // Validation error (invalid name or email format)
+      System.out.println("Invalid author data: " + e.getMessage());
+      return;
     } catch (Exception e) {
+      // Database constraint violation (e.g., duplicate email)
       System.out.println("Author already exists, fetching from DB...");
       author = authorRepository.findByEmail("john@example.com").orElseThrow();
     }
