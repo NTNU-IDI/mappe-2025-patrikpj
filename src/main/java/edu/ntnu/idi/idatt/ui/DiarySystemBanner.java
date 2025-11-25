@@ -52,6 +52,11 @@ public class DiarySystemBanner {
     return sb.toString();
   }
 
+  /**
+   * Prints the banner to the console. Used for testing.
+   *
+   * @param args command line arguments (not used)
+   */
   public static void main(String[] args) {
     System.out.println(getColoredBanner());
   }

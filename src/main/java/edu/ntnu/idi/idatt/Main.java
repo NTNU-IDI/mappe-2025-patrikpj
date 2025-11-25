@@ -18,6 +18,11 @@ public class Main {
     Logger.getLogger("org.hibernate").setLevel(Level.SEVERE);
   }
 
+  /**
+   * Application entry point.
+   *
+   * @param args command line arguments (not used)
+   */
   public static void main(String[] args) {
     AuthorRepository authorRepository = new AuthorRepository();
     DiaryEntryRepository diaryEntryRepository = new DiaryEntryRepository();
