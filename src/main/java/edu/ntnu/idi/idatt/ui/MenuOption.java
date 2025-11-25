@@ -58,11 +58,14 @@ public class MenuOption {
   }
 
   /**
-   * Returns the label of this option.
+   * Returns the label of this option, marked if its a submenu.
    *
    * @return the option label
    */
   public String getLabel() {
+    if (submenu != null) {
+      return label + " [...]";
+    }
     return label;
   }
 
