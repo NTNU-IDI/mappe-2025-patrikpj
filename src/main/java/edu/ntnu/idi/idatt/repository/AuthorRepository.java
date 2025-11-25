@@ -106,7 +106,7 @@ public class AuthorRepository {
   public Optional<Author> findByEmail(String email) {
     try (Session session = HibernateUtil.getSessionFactory().openSession()) {
       return session.createQuery("FROM Author WHERE email = :email", Author.class)
-          .setParameter("email", email)
+          .setParameter("email", email.toLowerCase())
           .uniqueResultOptional();
     }
   }

@@ -166,7 +166,7 @@ public class Author {
   }
 
   /**
-   * Sets the author's email.
+   * Sets the author's email. The email is normalized to lowercase.
    *
    * @param email the email (must be valid format)
    * @throws IllegalArgumentException if email is null, blank, or invalid format
@@ -175,10 +175,11 @@ public class Author {
     if (email == null || email.isBlank()) {
       throw new IllegalArgumentException("Email cannot be null or blank");
     }
-    if (!EMAIL_PATTERN.matcher(email).matches()) {
+    String normalizedEmail = email.toLowerCase();
+    if (!EMAIL_PATTERN.matcher(normalizedEmail).matches()) {
       throw new IllegalArgumentException("Invalid email format");
     }
-    this.email = email;
+    this.email = normalizedEmail;
   }
 
   /**
