@@ -143,8 +143,23 @@ public class DiaryApp {
 
   // --- Author Actions ---
 
+  /**
+   * Lists all authors in the database.
+   */
   private void listAuthors() {
-    System.out.println("List Authors (not implemented)");
+    System.out.println("\n== All Authors ==");
+
+    var authors = authorRepository.findAll();
+    if (authors.isEmpty()) {
+      System.out.println("No authors found.");
+      return;
+    }
+
+    for (int i = 0; i < authors.size(); i++) {
+      var author = authors.get(i);
+      System.out.printf("%d. %s%n", i + 1, author);
+    }
+    System.out.println("\nTotal: " + authors.size() + " author(s)");
   }
 
   /**
