@@ -28,7 +28,7 @@ public final class InputHelper {
     System.out.print(prompt);
     String input = scanner.nextLine().trim();
     if (input.isEmpty()) {
-      System.out.println("Cancelled.");
+      System.out.println(AnsiColors.RED + "Cancelled." + AnsiColors.RESET);
       return null;
     }
     return input;
@@ -47,14 +47,14 @@ public final class InputHelper {
       System.out.print(prompt);
       input = scanner.nextLine().trim();
       if (input.isEmpty()) {
-        System.out.println("Input cannot be empty. Please try again.");
+        System.out.println(AnsiColors.RED + "Input cannot be empty. Please try again." + AnsiColors.RESET);
       }
     } while (input.isEmpty());
     return input;
   }
 
   /**
-   * Prompts for input with validation and retry option. Returns null if cancelled.
+   * Prompts for input with validation. Loops until valid. Returns null if cancelled.
    *
    * @param scanner   the scanner to read input from
    * @param prompt    the prompt message
@@ -64,8 +64,10 @@ public final class InputHelper {
   public static String promptValidatedInput(Scanner scanner, String prompt,
       Consumer<String> validator) {
     while (true) {
-      String input = promptInput(scanner, prompt);
-      if (input == null) {
+      System.out.print(prompt);
+      String input = scanner.nextLine().trim();
+      if (input.isEmpty()) {
+        System.out.println(AnsiColors.RED + "Cancelled." + AnsiColors.RESET);
         return null;
       }
 
@@ -73,32 +75,28 @@ public final class InputHelper {
         validator.accept(input);
         return input;
       } catch (IllegalArgumentException e) {
-        System.out.println(AnsiColors.RED + "Invalid: " + e.getMessage() + AnsiColors.RESET);
-        if (!promptRetry(scanner)) {
-          return null;
-        }
+        System.out.println(AnsiColors.RED + e.getMessage() + ". Try again." + AnsiColors.RESET);
       }
     }
   }
 
   /**
-   * Reads and validates an email address with retry option. Returns null if cancelled.
+   * Reads and validates an email address. Loops until valid format. Returns null if cancelled.
    *
    * @param scanner the scanner to read input from
    * @return the valid email, or null if cancelled
    */
   public static String promptEmail(Scanner scanner) {
     while (true) {
-      String email = promptInput(scanner, "Email: ");
-      if (email == null) {
+      System.out.print("Email: ");
+      String email = scanner.nextLine().trim();
+      if (email.isEmpty()) {
+        System.out.println(AnsiColors.RED + "Cancelled." + AnsiColors.RESET);
         return null;
       }
 
       if (!Author.isValidEmail(email)) {
-        System.out.println(AnsiColors.RED + "Invalid email format" + AnsiColors.RESET);
-        if (!promptRetry(scanner)) {
-          return null;
-        }
+        System.out.println(AnsiColors.RED + "Invalid email format. Try again." + AnsiColors.RESET);
         continue;
       }
 
@@ -128,7 +126,7 @@ public final class InputHelper {
     }
 
     if (text.isEmpty()) {
-      System.out.println("Cancelled.");
+      System.out.println(AnsiColors.RED + "Cancelled." + AnsiColors.RESET);
       return null;
     }
 
