@@ -25,6 +25,19 @@ public class Author {
   private static final Pattern EMAIL_PATTERN =
       Pattern.compile("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
 
+  /**
+   * Checks if an email address has a valid format.
+   *
+   * @param email the email to validate
+   * @return true if valid, false otherwise
+   */
+  public static boolean isValidEmail(String email) {
+    if (email == null || email.isBlank()) {
+      return false;
+    }
+    return EMAIL_PATTERN.matcher(email.toLowerCase()).matches();
+  }
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
