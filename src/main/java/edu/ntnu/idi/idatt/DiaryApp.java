@@ -1,5 +1,6 @@
 package edu.ntnu.idi.idatt;
 
+import edu.ntnu.idi.idatt.model.Author;
 import edu.ntnu.idi.idatt.repository.AuthorRepository;
 import edu.ntnu.idi.idatt.repository.DiaryEntryRepository;
 import edu.ntnu.idi.idatt.ui.AnsiColors;
@@ -7,6 +8,7 @@ import edu.ntnu.idi.idatt.ui.DiarySystemBanner;
 import edu.ntnu.idi.idatt.ui.Menu;
 import edu.ntnu.idi.idatt.ui.MenuOption;
 import edu.ntnu.idi.idatt.util.HibernateUtil;
+import edu.ntnu.idi.idatt.util.InputHelper;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -62,7 +64,7 @@ public class DiaryApp {
    * @return the entries submenu
    */
   private Menu buildEntriesMenu() {
-    Menu entriesMenu = new Menu("Diary Entries", this.scanner);
+    Menu entriesMenu = new Menu("== Diary Entries ==", this.scanner);
     entriesMenu.addOption(new MenuOption("Create New Entry", this::createEntry));
     entriesMenu.addOption(new MenuOption("List All Entries", this::listEntries));
     entriesMenu.addOption(new MenuOption("Back", AnsiColors.RED, () -> {}));
@@ -76,7 +78,7 @@ public class DiaryApp {
    * @return the search submenu
    */
   private Menu buildSearchMenu() {
-    Menu searchMenu = new Menu("Search Entries", this.scanner);
+    Menu searchMenu = new Menu("== Search Entries ==", this.scanner);
     searchMenu.addOption(new MenuOption("Search by Date", this::searchByDate));
     searchMenu.addOption(new MenuOption("Search by Date Range", this::searchByDateRange));
     searchMenu.addOption(new MenuOption("Search by Author", this::searchByAuthor));
@@ -92,7 +94,7 @@ public class DiaryApp {
    * @return the authors submenu
    */
   private Menu buildAuthorsMenu() {
-    Menu authorsMenu = new Menu("Authors", this.scanner);
+    Menu authorsMenu = new Menu("== Authors ==", this.scanner);
     authorsMenu.addOption(new MenuOption("List Authors", this::listAuthors));
     authorsMenu.addOption(new MenuOption("Add New Author", this::createAuthor));
     authorsMenu.addOption(new MenuOption("Back", AnsiColors.RED, () -> {}));
@@ -145,8 +147,58 @@ public class DiaryApp {
     System.out.println("List Authors (not implemented)");
   }
 
+  /**
+   * Prompts user to create a new author with per-field validation.
+   */
   private void createAuthor() {
-    System.out.println("Create Author (not implemented)");
+    System.out.println("\n== Add New Author ==");
+
+    String firstName = InputHelper.promptValidatedInput(scanner, "First name: ",
+        InputHelper::validateNotBlank);
+    if (firstName == null) {
+      return;
+    }
+
+    String lastName = InputHelper.promptValidatedInput(scanner, "Last name: ",
+        InputHelper::validateNotBlank);
+    if (lastName == null) {
+      return;
+    }
+
+    String email = promptUniqueEmail();
+    if (email == null) {
+      return;
+    }
+
+    Author author = new Author(firstName, lastName, email);
+    authorRepository.save(author);
+    System.out.println(AnsiColors.GREEN + "Author created: " + author + AnsiColors.RESET);
+  }
+
+  /**
+   * Prompts for email with format validation and duplicate checking.
+   *
+   * @return the valid unique email, or null if cancelled
+   */
+  private String promptUniqueEmail() {
+    while (true) {
+      String email = InputHelper.promptEmail(scanner);
+      if (email == null) {
+        return null;
+      }
+
+      // Check for duplicate
+      if (authorRepository.findByEmail(email).isPresent()) {
+        System.out.println(AnsiColors.RED + "An author with this email already exists"
+            + AnsiColors.RESET);
+        if (!InputHelper.promptRetry(scanner)) {
+          return null;
+        }
+        continue;
+      }
+
+      return email;
+    }
   }
 
   // --- Statistics ---
@@ -154,6 +206,8 @@ public class DiaryApp {
   private void showStatistics() {
     System.out.println("Statistics (not implemented)");
   }
+
+  // --- Application Lifecycle ---
 
   private void exit() {
     System.out.println("Exiting...");
@@ -169,5 +223,6 @@ public class DiaryApp {
     }
     HibernateUtil.shutdown();
   }
+
 }
 
