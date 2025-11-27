@@ -1,12 +1,12 @@
-[![Review Assignment Due Date]([x]https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/INcAwgxk)
+[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/INcAwgxk)
 # Portfolio project IDATT1003
 
-STUDENT NAME = "Patrik Pereira Johannessen"  
-STUDENT ID = "157285"
+STUDENT NAME = Patrik Pereira Johannessen  
+STUDENT ID = 157285
 
 
 ## Project description
-A command-line diary application where the user can create and manage authors and diary entries. The application uses Hibernate ORM with SQLite for persistence and follows an MVC architecture with clear separation between controllers, services, and repositories. Features include author management, entry creation, search functionality, and paginated list views.
+A command-line diary application where the user can create and manage authors and diary entries. The application uses the Hibernate ORM with SQLite for persistence and follows an MVC architecture with clear separation between controllers, services, and repositories. Features include author management, entry creation, search functionality, and paginated list views.
 
 
 ## Project structure
