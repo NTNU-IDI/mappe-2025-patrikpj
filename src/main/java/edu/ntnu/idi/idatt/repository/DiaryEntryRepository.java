@@ -1,11 +1,13 @@
 package edu.ntnu.idi.idatt.repository;
 
-import edu.ntnu.idi.idatt.model.Author;
-import edu.ntnu.idi.idatt.model.DiaryEntry;
-import edu.ntnu.idi.idatt.util.HibernateUtil;
+import edu.ntnu.idi.idatt.model.entities.Author;
+import edu.ntnu.idi.idatt.model.entities.DiaryEntry;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
 /**
@@ -13,25 +15,31 @@ import org.hibernate.Transaction;
  */
 public class DiaryEntryRepository {
 
+  private final SessionFactory sessionFactory;
+
+  /**
+   * Creates a new DiaryEntryRepository with the given SessionFactory.
+   *
+   * @param sessionFactory the Hibernate SessionFactory
+   * @throws NullPointerException if sessionFactory is null
+   */
+  public DiaryEntryRepository(SessionFactory sessionFactory) {
+    this.sessionFactory = Objects.requireNonNull(sessionFactory, "SessionFactory cannot be null");
+  }
+
   /**
    * Saves a new diary entry to the database.
    *
    * @param entry the diary entry to save
    * @return the saved entry with generated ID
+   * @throws NullPointerException if entry is null
    */
   public DiaryEntry save(DiaryEntry entry) {
-    Transaction transaction = null;
-    try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-      transaction = session.beginTransaction();
+    Objects.requireNonNull(entry, "DiaryEntry cannot be null");
+    return executeInTransaction(session -> {
       session.persist(entry);
-      transaction.commit();
       return entry;
-    } catch (Exception e) {
-      if (transaction != null) {
-        transaction.rollback();
-      }
-      throw e;
-    }
+    });
   }
 
   /**
@@ -39,21 +47,22 @@ public class DiaryEntryRepository {
    *
    * @param id the entry ID
    * @return an Optional containing the entry, or empty if not found
+   * @throws NullPointerException if id is null
    */
   public Optional<DiaryEntry> findById(Long id) {
-    try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-      DiaryEntry entry = session.get(DiaryEntry.class, id);
-      return Optional.ofNullable(entry);
+    Objects.requireNonNull(id, "ID cannot be null");
+    try (Session session = sessionFactory.openSession()) {
+      return Optional.ofNullable(session.get(DiaryEntry.class, id));
     }
   }
 
   /**
    * Retrieves all diary entries from the database.
    *
-   * @return a list of all diary entries
+   * @return a list of all diary entries (never null)
    */
   public List<DiaryEntry> findAll() {
-    try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+    try (Session session = sessionFactory.openSession()) {
       return session.createQuery("FROM DiaryEntry", DiaryEntry.class).list();
     }
   }
@@ -62,26 +71,52 @@ public class DiaryEntryRepository {
    * Finds all diary entries by a specific author.
    *
    * @param author the author to search for
-   * @return a list of diary entries by the author
+   * @return a list of entries by the author (never null)
+   * @throws NullPointerException if author is null
    */
   public List<DiaryEntry> findByAuthor(Author author) {
-    try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-      return session.createQuery("FROM DiaryEntry WHERE author = :author", DiaryEntry.class)
+    Objects.requireNonNull(author, "Author cannot be null");
+    try (Session session = sessionFactory.openSession()) {
+      return session
+          .createQuery("FROM DiaryEntry WHERE author = :author", DiaryEntry.class)
           .setParameter("author", author)
           .list();
     }
   }
 
   /**
-   * Finds all diary entries containing a keyword in the title.
+   * Finds all diary entries by author ID.
    *
-   * @param keyword the keyword to search for
-   * @return a list of matching diary entries
+   * @param authorId the author ID to search for
+   * @return a list of entries by the author (never null)
+   * @throws NullPointerException if authorId is null
    */
-  public List<DiaryEntry> findByTitleContaining(String keyword) {
-    try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-      return session.createQuery("FROM DiaryEntry WHERE title LIKE :keyword", DiaryEntry.class)
-          .setParameter("keyword", "%" + keyword + "%")
+  public List<DiaryEntry> findByAuthorId(Long authorId) {
+    Objects.requireNonNull(authorId, "Author ID cannot be null");
+    try (Session session = sessionFactory.openSession()) {
+      return session
+          .createQuery("FROM DiaryEntry WHERE author.id = :authorId", DiaryEntry.class)
+          .setParameter("authorId", authorId)
+          .list();
+    }
+  }
+
+  /**
+   * Searches for diary entries containing the given text in title or content.
+   *
+   * @param searchText the text to search for (case-insensitive)
+   * @return a list of matching entries (never null)
+   * @throws NullPointerException if searchText is null
+   */
+  public List<DiaryEntry> searchByTitleOrContent(String searchText) {
+    Objects.requireNonNull(searchText, "Search text cannot be null");
+    try (Session session = sessionFactory.openSession()) {
+      String pattern = "%" + searchText.toLowerCase() + "%";
+      return session
+          .createQuery(
+              "FROM DiaryEntry WHERE LOWER(title) LIKE :pattern OR LOWER(content) LIKE :pattern",
+              DiaryEntry.class)
+          .setParameter("pattern", pattern)
           .list();
     }
   }
@@ -89,35 +124,76 @@ public class DiaryEntryRepository {
   /**
    * Updates an existing diary entry in the database.
    *
-   * @param entry the entry to update
+   * @param entry the diary entry to update
    * @return the updated entry
+   * @throws NullPointerException if entry is null
    */
   public DiaryEntry update(DiaryEntry entry) {
-    Transaction transaction = null;
-    try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-      transaction = session.beginTransaction();
-      DiaryEntry merged = session.merge(entry);
-      transaction.commit();
-      return merged;
-    } catch (Exception e) {
-      if (transaction != null) {
-        transaction.rollback();
-      }
-      throw e;
-    }
+    Objects.requireNonNull(entry, "DiaryEntry cannot be null");
+    return executeInTransaction(session -> session.merge(entry));
   }
 
   /**
    * Deletes a diary entry from the database.
    *
-   * @param entry the entry to delete
+   * @param entry the diary entry to delete
+   * @throws NullPointerException if entry is null
    */
   public void delete(DiaryEntry entry) {
+    Objects.requireNonNull(entry, "DiaryEntry cannot be null");
+    executeInTransaction(session -> {
+      session.remove(session.contains(entry) ? entry : session.merge(entry));
+      return null;
+    });
+  }
+
+  /**
+   * Counts the total number of diary entries.
+   *
+   * @return the total count
+   */
+  public long count() {
+    try (Session session = sessionFactory.openSession()) {
+      Long count = session
+          .createQuery("SELECT COUNT(e) FROM DiaryEntry e", Long.class)
+          .uniqueResult();
+      return count != null ? count : 0;
+    }
+  }
+
+  /**
+   * Counts the number of diary entries by a specific author.
+   *
+   * @param authorId the author ID
+   * @return the count of entries by the author
+   * @throws NullPointerException if authorId is null
+   */
+  public long countByAuthorId(Long authorId) {
+    Objects.requireNonNull(authorId, "Author ID cannot be null");
+    try (Session session = sessionFactory.openSession()) {
+      Long count = session
+          .createQuery("SELECT COUNT(e) FROM DiaryEntry e WHERE e.author.id = :authorId",
+              Long.class)
+          .setParameter("authorId", authorId)
+          .uniqueResult();
+      return count != null ? count : 0;
+    }
+  }
+
+  /**
+   * Executes an operation within a transaction, handling commit and rollback.
+   *
+   * @param operation the operation to execute
+   * @param <T>       the return type
+   * @return the result of the operation
+   */
+  private <T> T executeInTransaction(Function<Session, T> operation) {
     Transaction transaction = null;
-    try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+    try (Session session = sessionFactory.openSession()) {
       transaction = session.beginTransaction();
-      session.remove(entry);
+      T result = operation.apply(session);
       transaction.commit();
+      return result;
     } catch (Exception e) {
       if (transaction != null) {
         transaction.rollback();

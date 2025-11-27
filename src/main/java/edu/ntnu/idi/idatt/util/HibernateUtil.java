@@ -1,23 +1,46 @@
 package edu.ntnu.idi.idatt.util;
 
+import java.io.InputStream;
+import java.util.logging.LogManager;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
 /**
- * Utility class for managing the Hibernate SessionFactory.
- * Provides a singleton SessionFactory instance for the application.
+ * Utility class for Hibernate SessionFactory management.
  */
-public class HibernateUtil {
+public final class HibernateUtil {
 
-  private static final SessionFactory sessionFactory = buildSessionFactory();
+  private static final SessionFactory SESSION_FACTORY;
 
-  private static SessionFactory buildSessionFactory() {
+  static {
+    // Suppress Hibernate logging before initialization
+    silenceLogging();
+    
     try {
-      // Create SessionFactory from hibernate.cfg.xml
-      return new Configuration().configure().buildSessionFactory();
-    } catch (Throwable ex) {
-      System.err.println("Initial SessionFactory creation failed: " + ex);
-      throw new ExceptionInInitializerError(ex);
+      SESSION_FACTORY = new Configuration().configure().buildSessionFactory();
+    } catch (Exception e) {
+      System.err.println("SessionFactory creation failed: " + e.getMessage());
+      throw new ExceptionInInitializerError(e);
+    }
+  }
+
+  private HibernateUtil() {
+    // Prevent instantiation
+  }
+
+  /**
+   * Configures java.util.logging to suppress Hibernate output.
+   */
+  private static void silenceLogging() {
+    try {
+      InputStream stream = HibernateUtil.class.getClassLoader()
+          .getResourceAsStream("logging.properties");
+      if (stream != null) {
+        LogManager.getLogManager().readConfiguration(stream);
+        stream.close();
+      }
+    } catch (Exception e) {
+      // Ignore logging config errors
     }
   }
 
@@ -27,14 +50,15 @@ public class HibernateUtil {
    * @return the SessionFactory
    */
   public static SessionFactory getSessionFactory() {
-    return sessionFactory;
+    return SESSION_FACTORY;
   }
 
   /**
    * Closes the SessionFactory and releases all resources.
    */
   public static void shutdown() {
-    getSessionFactory().close();
+    if (SESSION_FACTORY != null) {
+      SESSION_FACTORY.close();
+    }
   }
 }
-

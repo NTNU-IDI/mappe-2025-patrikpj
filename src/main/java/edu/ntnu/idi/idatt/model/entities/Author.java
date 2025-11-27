@@ -1,4 +1,4 @@
-package edu.ntnu.idi.idatt.model;
+package edu.ntnu.idi.idatt.model.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,9 +14,6 @@ import java.util.regex.Pattern;
 
 /**
  * Represents an author entity in the database.
- *
- * <p>Instances of this class enforce non-null, non-blank names and a syntactically
- * valid email address format.</p>
  */
 @Entity
 @Table(name = "authors")
@@ -60,7 +57,7 @@ public class Author {
   /**
    * Default constructor required by Hibernate.
    */
-  public Author() {
+  protected Author() {
   }
 
   /**
@@ -69,7 +66,8 @@ public class Author {
    * @param firstName the author's first name (cannot be null or blank)
    * @param lastName  the author's last name (cannot be null or blank)
    * @param email     the author's email (must be valid format)
-   * @throws IllegalArgumentException if any argument is null, blank, or invalid
+   * @throws NullPointerException     if any argument is null
+   * @throws IllegalArgumentException if any argument is blank or email is invalid
    */
   public Author(String firstName, String lastName, String email) {
     setFirstName(firstName);
@@ -78,12 +76,12 @@ public class Author {
   }
 
   /**
-   * Sets timestamps before first save.
+   * Sets timestamps before first persist.
    */
   @PrePersist
   protected void onCreate() {
-    createdAt = LocalDateTime.now();
-    updatedAt = LocalDateTime.now();
+    this.createdAt = LocalDateTime.now();
+    this.updatedAt = LocalDateTime.now();
   }
 
   /**
@@ -91,27 +89,16 @@ public class Author {
    */
   @PreUpdate
   protected void onUpdate() {
-    updatedAt = LocalDateTime.now();
+    this.updatedAt = LocalDateTime.now();
   }
-
-  // Getters
 
   /**
    * Returns the unique identifier of this author.
    *
-   * @return the author ID
+   * @return the author ID, or null if not yet persisted
    */
   public Long getId() {
     return id;
-  }
-
-  /**
-   * Sets the unique identifier of this author.
-   *
-   * @param id the author ID
-   */
-  public void setId(Long id) {
-    this.id = id;
   }
 
   /**
@@ -123,19 +110,19 @@ public class Author {
     return firstName;
   }
 
-  // Setters
-
   /**
    * Sets the author's first name.
    *
    * @param firstName the first name (cannot be null or blank)
-   * @throws IllegalArgumentException if firstName is null or blank
+   * @throws NullPointerException     if firstName is null
+   * @throws IllegalArgumentException if firstName is blank
    */
   public void setFirstName(String firstName) {
-    if (firstName == null || firstName.isBlank()) {
-      throw new IllegalArgumentException("First name cannot be null or blank");
+    Objects.requireNonNull(firstName, "First name cannot be null");
+    if (firstName.isBlank()) {
+      throw new IllegalArgumentException("First name cannot be blank");
     }
-    this.firstName = firstName;
+    this.firstName = firstName.trim();
   }
 
   /**
@@ -151,19 +138,21 @@ public class Author {
    * Sets the author's last name.
    *
    * @param lastName the last name (cannot be null or blank)
-   * @throws IllegalArgumentException if lastName is null or blank
+   * @throws NullPointerException     if lastName is null
+   * @throws IllegalArgumentException if lastName is blank
    */
   public void setLastName(String lastName) {
-    if (lastName == null || lastName.isBlank()) {
-      throw new IllegalArgumentException("Last name cannot be null or blank");
+    Objects.requireNonNull(lastName, "Last name cannot be null");
+    if (lastName.isBlank()) {
+      throw new IllegalArgumentException("Last name cannot be blank");
     }
-    this.lastName = lastName;
+    this.lastName = lastName.trim();
   }
 
   /**
    * Returns the author's full name.
    *
-   * @return first name + last name
+   * @return first name and last name
    */
   public String getFullName() {
     return firstName + " " + lastName;
@@ -172,25 +161,27 @@ public class Author {
   /**
    * Returns the email address of this author.
    *
-   * @return the email
+   * @return the email (always lowercase)
    */
   public String getEmail() {
     return email;
   }
 
   /**
-   * Sets the author's email. The email is normalized to lowercase.
+   * Sets the author's email. The email is normalized to lowercase and trimmed.
    *
    * @param email the email (must be valid format)
-   * @throws IllegalArgumentException if email is null, blank, or invalid format
+   * @throws NullPointerException     if email is null
+   * @throws IllegalArgumentException if email is blank or invalid format
    */
   public void setEmail(String email) {
-    if (email == null || email.isBlank()) {
-      throw new IllegalArgumentException("Email cannot be null or blank");
+    Objects.requireNonNull(email, "Email cannot be null");
+    if (email.isBlank()) {
+      throw new IllegalArgumentException("Email cannot be blank");
     }
-    String normalizedEmail = email.toLowerCase();
+    String normalizedEmail = email.trim().toLowerCase();
     if (!EMAIL_PATTERN.matcher(normalizedEmail).matches()) {
-      throw new IllegalArgumentException("Invalid email format");
+      throw new IllegalArgumentException("Invalid email format: " + email);
     }
     this.email = normalizedEmail;
   }
@@ -213,34 +204,40 @@ public class Author {
     return updatedAt;
   }
 
-  // Overrides
-
   /**
    * Returns a string representation of this author.
    *
-   * @return the author's full name and email
+   * @return the author's full name followed by email in parentheses
    */
   @Override
   public String toString() {
-    return firstName + " " + lastName + " (" + email + ")";
+    return getFullName() + " (" + email + ")";
   }
 
+  /**
+   * Compares this author to another based on email.
+   *
+   * @param o the object to compare
+   * @return true if emails match, false otherwise
+   */
   @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof Author author)) {
+    if (!(o instanceof Author other)) {
       return false;
     }
-    return Objects.equals(firstName, author.firstName)
-        && Objects.equals(lastName, author.lastName)
-        && Objects.equals(email, author.email);
+    return Objects.equals(email, other.email);
   }
 
+  /**
+   * Returns a hash code based on email.
+   *
+   * @return hash code
+   */
   @Override
   public int hashCode() {
-    return Objects.hash(firstName, lastName, email);
+    return Objects.hash(email);
   }
 }
-

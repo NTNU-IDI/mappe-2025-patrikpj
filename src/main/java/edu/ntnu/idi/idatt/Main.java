@@ -6,7 +6,7 @@ package edu.ntnu.idi.idatt;
 public class Main {
 
   /**
-   * Starts the Diary application.
+   * Main method.
    *
    * @param args command line arguments (not used)
    */

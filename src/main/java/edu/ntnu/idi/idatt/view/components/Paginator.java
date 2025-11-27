@@ -1,6 +1,5 @@
-package edu.ntnu.idi.idatt.util;
+package edu.ntnu.idi.idatt.view.components;
 
-import edu.ntnu.idi.idatt.ui.AnsiColors;
 import java.util.List;
 import java.util.Scanner;
 import java.util.function.Function;
@@ -19,7 +18,6 @@ public class Paginator<T> {
   private final String title;
   private final Function<T, String> formatter;
   private final int pageSize;
-
   private int currentPage = 0;
 
   /**
@@ -44,7 +42,7 @@ public class Paginator<T> {
    * @param pageSize  number of items per page
    */
   public Paginator(List<T> items, Scanner scanner, String title,
-      Function<T, String> formatter, int pageSize) {
+                   Function<T, String> formatter, int pageSize) {
     this.items = items;
     this.scanner = scanner;
     this.title = title;
@@ -54,7 +52,6 @@ public class Paginator<T> {
 
   /**
    * Displays the paginated list and handles navigation.
-   * Returns the selected item or null if user exits without selection.
    *
    * @return the selected item, or null if cancelled
    */
@@ -87,7 +84,6 @@ public class Paginator<T> {
 
   /**
    * Displays the paginated list without selection capability.
-   * Just allows browsing through pages.
    */
   public void showReadOnly() {
     if (items.isEmpty()) {
@@ -111,6 +107,9 @@ public class Paginator<T> {
     }
   }
 
+  /**
+   * Displays the current page of items.
+   */
   private void displayCurrentPage() {
     int totalPages = getTotalPages();
     int start = currentPage * pageSize;
@@ -119,15 +118,21 @@ public class Paginator<T> {
     System.out.println();
     System.out.printf("== %s (Page %d of %d) ==%n", title, currentPage + 1, totalPages);
 
+    int displayIndex = 1;
     for (int i = start; i < end; i++) {
       T item = items.get(i);
       System.out.printf("[%s%d%s] - %s%n",
-          AnsiColors.CYAN, i + 1, AnsiColors.RESET, formatter.apply(item));
+          AnsiColors.CYAN, displayIndex++, AnsiColors.RESET, formatter.apply(item));
     }
 
     System.out.printf("%nTotal: %d item(s)%n", items.size());
   }
 
+  /**
+   * Prompts for navigation input with selection option.
+   *
+   * @return the user input, or null if input stream closed
+   */
   private String promptNavigation() {
     StringBuilder options = new StringBuilder();
     options.append("\n");
@@ -139,19 +144,27 @@ public class Paginator<T> {
       options.append(String.format("[%sP%s] Previous  ", AnsiColors.CYAN, AnsiColors.RESET));
     }
 
-    int start = currentPage * pageSize + 1;
-    int end = Math.min(start + pageSize - 1, items.size());
-    options.append(String.format("[%s%d-%d%s] Select  ",
-        AnsiColors.CYAN, start, end, AnsiColors.RESET));
+    int itemsOnPage = Math.min(pageSize, items.size() - currentPage * pageSize);
+    options.append(String.format("[%s1-%d%s] Select  ",
+        AnsiColors.CYAN, itemsOnPage, AnsiColors.RESET));
     options.append(String.format("[%sB%s] Back", AnsiColors.RED, AnsiColors.RESET));
 
     System.out.println(options);
     System.out.print("\n-> ");
 
-    String input = scanner.nextLine().trim();
-    return input.isEmpty() ? null : input;
+    try {
+      String input = scanner.nextLine().trim();
+      return input.isEmpty() ? null : input;
+    } catch (Exception e) {
+      return "b";  // Treat as back on Ctrl+C or closed stream
+    }
   }
 
+  /**
+   * Prompts for navigation input without selection option.
+   *
+   * @return the user input, or null if input stream closed
+   */
   private String promptNavigationReadOnly() {
     StringBuilder options = new StringBuilder();
     options.append("\n");
@@ -167,15 +180,28 @@ public class Paginator<T> {
     System.out.println(options);
     System.out.print("\n-> ");
 
-    String input = scanner.nextLine().trim();
-    return input.isEmpty() ? null : input;
+    try {
+      String input = scanner.nextLine().trim();
+      return input.isEmpty() ? null : input;
+    } catch (Exception e) {
+      return "b";  // Treat as back on Ctrl+C or closed stream
+    }
   }
 
+  /**
+   * Attempts to select an item by its page-local number.
+   *
+   * @param input the user input
+   * @return the selected item, or null if invalid
+   */
   private T trySelect(String input) {
     try {
-      int index = Integer.parseInt(input) - 1;
-      if (index >= 0 && index < items.size()) {
-        return items.get(index);
+      int pageIndex = Integer.parseInt(input) - 1;  // 0-based index on current page
+      int itemsOnPage = Math.min(pageSize, items.size() - currentPage * pageSize);
+      
+      if (pageIndex >= 0 && pageIndex < itemsOnPage) {
+        int globalIndex = currentPage * pageSize + pageIndex;
+        return items.get(globalIndex);
       } else {
         System.out.println(AnsiColors.RED + "Invalid selection" + AnsiColors.RESET);
       }

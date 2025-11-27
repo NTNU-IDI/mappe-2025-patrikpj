@@ -1,96 +1,85 @@
 package edu.ntnu.idi.idatt;
 
-import edu.ntnu.idi.idatt.handler.AuthorHandler;
-import edu.ntnu.idi.idatt.handler.EntryHandler;
-import edu.ntnu.idi.idatt.handler.SearchHandler;
-import edu.ntnu.idi.idatt.handler.StatisticsHandler;
+import edu.ntnu.idi.idatt.controller.AuthorController;
 import edu.ntnu.idi.idatt.repository.AuthorRepository;
 import edu.ntnu.idi.idatt.repository.DiaryEntryRepository;
-import edu.ntnu.idi.idatt.ui.AnsiColors;
-import edu.ntnu.idi.idatt.ui.DiarySystemBanner;
-import edu.ntnu.idi.idatt.ui.Menu;
-import edu.ntnu.idi.idatt.ui.MenuOption;
+import edu.ntnu.idi.idatt.service.AuthorService;
+import edu.ntnu.idi.idatt.service.DiaryEntryService;
 import edu.ntnu.idi.idatt.util.HibernateUtil;
+import edu.ntnu.idi.idatt.view.components.AnsiColors;
+import edu.ntnu.idi.idatt.view.components.MenuOption;
+import edu.ntnu.idi.idatt.view.components.MenuView;
 import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.hibernate.SessionFactory;
 
 /**
  * Main application class for the Diary System.
- * Handles initialization, main menu, and application lifecycle.
  */
 public class DiaryApp {
 
-  static {
-    // Silence Hibernate logging
-    Logger.getLogger("org.hibernate").setLevel(Level.SEVERE);
-  }
-
-  private Menu menu;
   private Scanner scanner;
 
   // Repositories
   private AuthorRepository authorRepository;
   private DiaryEntryRepository diaryEntryRepository;
 
-  // Handlers
-  private AuthorHandler authorHandler;
-  private EntryHandler entryHandler;
-  private SearchHandler searchHandler;
-  private StatisticsHandler statisticsHandler;
+  // Services
+  private AuthorService authorService;
+  private DiaryEntryService diaryEntryService;
+
+  // Controllers
+  private AuthorController authorController;
+  // private EntryController entryController;  // TODO: implement
+
+  // Main menu
+  private MenuView mainMenu;
 
   /**
-   * Initializes the application components.
+   * Initializes all application components.
    */
   public void init() {
+    // Create scanner
     this.scanner = new Scanner(System.in);
-    this.authorRepository = new AuthorRepository();
-    this.diaryEntryRepository = new DiaryEntryRepository();
 
-    // Initialize handlers
-    this.authorHandler = new AuthorHandler(scanner, authorRepository, diaryEntryRepository);
-    this.entryHandler = new EntryHandler(scanner, authorRepository, diaryEntryRepository);
-    this.searchHandler = new SearchHandler(scanner, authorRepository, diaryEntryRepository);
-    this.statisticsHandler = new StatisticsHandler(scanner, authorRepository, diaryEntryRepository);
+    // Initialize Hibernate (catches config errors early)
+    SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
 
-    // Initialize database connection early
-    HibernateUtil.getSessionFactory();
+    // Create repositories
+    this.authorRepository = new AuthorRepository(sessionFactory);
+    this.diaryEntryRepository = new DiaryEntryRepository(sessionFactory);
 
-    // Register shutdown hook for Ctrl+C
-    Runtime.getRuntime().addShutdownHook(new Thread(this::cleanup));
+    // Create services
+    this.authorService = new AuthorService(authorRepository);
+    this.diaryEntryService = new DiaryEntryService(diaryEntryRepository);
 
+    // Create controllers
+    this.authorController = new AuthorController(authorService, diaryEntryService, scanner);
+    // this.entryController = new EntryController(authorService, diaryEntryService, scanner);
+
+    // Build menus
     buildMenu();
+
+    // Register shutdown hook for cleanup on Ctrl+C or exit
+    Runtime.getRuntime().addShutdownHook(new Thread(this::cleanup));
   }
 
   /**
-   * Builds the main menu with submenus from handlers.
+   * Builds the main menu.
    */
   private void buildMenu() {
-    this.menu = new Menu("", this.scanner);
+    this.mainMenu = new MenuView("== Diary System ==", scanner, true);
 
-    menu.addOption(new MenuOption("Diary Entries", entryHandler.getMenu()));
-    menu.addOption(new MenuOption("Search Entries", searchHandler.getMenu()));
-    menu.addOption(new MenuOption("Authors", authorHandler.getMenu()));
-    menu.addOption(new MenuOption("Statistics", statisticsHandler::showStatistics));
-    menu.addOption(new MenuOption("Exit", AnsiColors.RED, this::exit));
+    mainMenu.addOption(new MenuOption("Diary Entries", createTempEntryMenu()));  // TODO: entryController.getMenu()
+    mainMenu.addOption(new MenuOption("Authors", authorController.getMenu()));
+    mainMenu.addOption(new MenuOption("Statistics", AnsiColors.GREEN, this::showStatistics));
   }
 
   /**
    * Starts the application.
    */
   public void start() {
-    System.out.println(DiarySystemBanner.getColoredBanner());
-
-    if (menu != null) {
-      menu.show();
-    }
-  }
-
-  // --- Application Lifecycle ---
-
-  private void exit() {
-    System.out.println("Exiting...");
-    System.exit(0);  // Shutdown hook will call cleanup()
+    System.out.println("\n" + AnsiColors.CYAN + "Welcome to Diary System" + AnsiColors.RESET);
+    mainMenu.show();
   }
 
   /**
@@ -101,5 +90,22 @@ public class DiaryApp {
       scanner.close();
     }
     HibernateUtil.shutdown();
+  }
+
+  // ============ Temporary placeholders (remove when EntryController is ready) ============
+
+  private MenuView createTempEntryMenu() {
+    MenuView menu = new MenuView("== Diary Entries ==", scanner);
+    menu.addOption(new MenuOption("List Entries", () -> {
+      System.out.println("\nEntries:");
+      diaryEntryService.findAll().forEach(e -> System.out.println("  - " + e));
+    }));
+    return menu;
+  }
+
+  private void showStatistics() {
+    System.out.println("\n== Statistics ==");
+    System.out.println("Total authors: " + authorService.findAll().size());
+    System.out.println("Total entries: " + diaryEntryService.count());
   }
 }

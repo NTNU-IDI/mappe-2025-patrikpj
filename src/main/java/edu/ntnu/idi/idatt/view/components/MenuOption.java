@@ -1,12 +1,13 @@
-package edu.ntnu.idi.idatt.ui;
+package edu.ntnu.idi.idatt.view.components;
 
 /**
  * Represents a single option in a menu with a label and an action or submenu.
  */
 public class MenuOption {
+
   private final String label;
   private final Runnable action;
-  private final Menu submenu;
+  private final MenuView submenu;
   private final String numberColor;
 
   /**
@@ -40,7 +41,7 @@ public class MenuOption {
    * @param numberColor the ANSI color code for the option number
    * @param submenu     the submenu to display when selected
    */
-  public MenuOption(String label, String numberColor, Menu submenu) {
+  public MenuOption(String label, String numberColor, MenuView submenu) {
     this.label = label;
     this.numberColor = numberColor;
     this.submenu = submenu;
@@ -53,12 +54,12 @@ public class MenuOption {
    * @param label   the option label
    * @param submenu the submenu to display when selected
    */
-  public MenuOption(String label, Menu submenu) {
+  public MenuOption(String label, MenuView submenu) {
     this(label, AnsiColors.CYAN, submenu);
   }
 
   /**
-   * Returns the label of this option, marked if its a submenu.
+   * Returns the label of this option.
    *
    * @return the option label
    */
@@ -89,3 +90,4 @@ public class MenuOption {
     }
   }
 }
+
