@@ -13,7 +13,6 @@ public final class HibernateUtil {
   private static final SessionFactory SESSION_FACTORY;
 
   static {
-    // Suppress Hibernate logging before initialization
     silenceLogging();
     
     try {
