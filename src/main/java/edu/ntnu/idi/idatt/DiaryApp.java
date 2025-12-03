@@ -1,6 +1,7 @@
 package edu.ntnu.idi.idatt;
 
 import edu.ntnu.idi.idatt.controller.AuthorController;
+import edu.ntnu.idi.idatt.controller.DiaryEntryController;
 import edu.ntnu.idi.idatt.repository.AuthorRepository;
 import edu.ntnu.idi.idatt.repository.DiaryEntryRepository;
 import edu.ntnu.idi.idatt.service.AuthorService;
@@ -29,7 +30,7 @@ public class DiaryApp {
 
   // Controllers
   private AuthorController authorController;
-  // private EntryController entryController;  // TODO: implement
+  private DiaryEntryController entryController;
 
   // Main menu
   private MenuView mainMenu;
@@ -54,7 +55,7 @@ public class DiaryApp {
 
     // Create controllers
     this.authorController = new AuthorController(authorService, diaryEntryService, scanner);
-    // this.entryController = new EntryController(authorService, diaryEntryService, scanner);
+    this.entryController = new DiaryEntryController(diaryEntryService, authorService, scanner);
 
     // Build menus
     buildMenu();
@@ -69,7 +70,7 @@ public class DiaryApp {
   private void buildMenu() {
     this.mainMenu = new MenuView("== Diary System ==", scanner, true);
 
-    mainMenu.addOption(new MenuOption("Diary Entries", createTempEntryMenu()));  // TODO: entryController.getMenu()
+    mainMenu.addOption(new MenuOption("Diary Entries", entryController.getMenu()));
     mainMenu.addOption(new MenuOption("Authors", authorController.getMenu()));
     mainMenu.addOption(new MenuOption("Statistics", AnsiColors.GREEN, this::showStatistics));
   }
@@ -92,20 +93,9 @@ public class DiaryApp {
     HibernateUtil.shutdown();
   }
 
-  // ============ Temporary placeholders (remove when EntryController is ready) ============
-
-  private MenuView createTempEntryMenu() {
-    MenuView menu = new MenuView("== Diary Entries ==", scanner);
-    menu.addOption(new MenuOption("List Entries", () -> {
-      System.out.println("\nEntries:");
-      diaryEntryService.findAll().forEach(e -> System.out.println("  - " + e));
-    }));
-    return menu;
-  }
-
   private void showStatistics() {
     System.out.println("\n== Statistics ==");
     System.out.println("Total authors: " + authorService.findAll().size());
-    System.out.println("Total entries: " + diaryEntryService.count());
+    System.out.println("Total entawdawdries: " + diaryEntryService.count());
   }
 }
