@@ -8,6 +8,7 @@ import edu.ntnu.idi.idatt.service.AuthorService;
 import edu.ntnu.idi.idatt.service.DiaryEntryService;
 import edu.ntnu.idi.idatt.util.HibernateUtil;
 import edu.ntnu.idi.idatt.view.components.AnsiColors;
+import edu.ntnu.idi.idatt.view.components.DiarySystemBanner;
 import edu.ntnu.idi.idatt.view.components.MenuOption;
 import edu.ntnu.idi.idatt.view.components.MenuView;
 import java.util.Scanner;
@@ -79,7 +80,7 @@ public class DiaryApp {
    * Starts the application.
    */
   public void start() {
-    System.out.println("\n" + AnsiColors.CYAN + "Welcome to Diary System" + AnsiColors.RESET);
+    System.out.println(DiarySystemBanner.getColoredBanner());
     mainMenu.show();
   }
 
@@ -96,6 +97,6 @@ public class DiaryApp {
   private void showStatistics() {
     System.out.println("\n== Statistics ==");
     System.out.println("Total authors: " + authorService.findAll().size());
-    System.out.println("Total entawdawdries: " + diaryEntryService.count());
+    System.out.println("Total entries: " + diaryEntryService.count());
   }
 }
