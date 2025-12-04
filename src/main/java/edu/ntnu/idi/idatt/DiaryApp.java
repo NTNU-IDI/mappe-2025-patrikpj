@@ -6,6 +6,7 @@ import edu.ntnu.idi.idatt.repository.AuthorRepository;
 import edu.ntnu.idi.idatt.repository.DiaryEntryRepository;
 import edu.ntnu.idi.idatt.service.AuthorService;
 import edu.ntnu.idi.idatt.service.DiaryEntryService;
+import edu.ntnu.idi.idatt.service.StatisticsService;
 import edu.ntnu.idi.idatt.util.HibernateUtil;
 import edu.ntnu.idi.idatt.view.components.AnsiColors;
 import edu.ntnu.idi.idatt.view.components.DiarySystemBanner;
@@ -28,6 +29,7 @@ public class DiaryApp {
   // Services
   private AuthorService authorService;
   private DiaryEntryService diaryEntryService;
+  private StatisticsService statisticsService;
 
   // Controllers
   private AuthorController authorController;
@@ -53,7 +55,8 @@ public class DiaryApp {
     // Create services
     this.authorService = new AuthorService(authorRepository);
     this.diaryEntryService = new DiaryEntryService(diaryEntryRepository);
-
+    this.statisticsService = new StatisticsService(authorService, diaryEntryService);
+    
     // Create controllers
     this.authorController = new AuthorController(authorService, diaryEntryService, scanner);
     this.entryController = new DiaryEntryController(diaryEntryService, authorService, scanner);
@@ -96,7 +99,11 @@ public class DiaryApp {
 
   private void showStatistics() {
     System.out.println("\n== Statistics ==");
-    System.out.println("Total authors: " + authorService.findAll().size());
-    System.out.println("Total entries: " + diaryEntryService.count());
+    System.out.println("Total authors: " + statisticsService.getTotalAuthors());
+    System.out.println("Total entries: " + statisticsService.getTotalEntries());
+    
+    System.out.println("\nEntries per author:");
+    statisticsService.getEntriesPerAuthor().forEach((author, count) ->
+        System.out.println("  " + author.getFullName() + " - " + count));
   }
 }
