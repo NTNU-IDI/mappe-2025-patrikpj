@@ -128,7 +128,7 @@ public class AuthorController {
    * @param author the selected author
    */
   private void showAuthorActions(Author author) {
-    MenuView actionsMenu = new MenuView("== " + author.getFullName() + " ==", scanner);
+    MenuView actionsMenu = new MenuView("== " + "Author: " + author.getFullName() + " ==", scanner);
     actionsMenu.addOption(new MenuOption("View Details", () -> viewDetails(author)));
     actionsMenu.addOption(new MenuOption("View Entries", () -> viewEntriesByAuthor(author)));
     actionsMenu.addOption(new MenuOption("Edit Author", () -> editAuthor(author)));

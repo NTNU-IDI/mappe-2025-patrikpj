@@ -170,7 +170,7 @@ public class DiaryEntryController {
    * @param entry the selected entry
    */
   private void showEntryActions(DiaryEntry entry) {
-    MenuView actionsMenu = new MenuView("== " + entry.getTitle() + " ==", scanner);
+    MenuView actionsMenu = new MenuView("== " + "Entry: " + entry.getTitle() + " ==", scanner);
     actionsMenu.addOption(new MenuOption("View Full Entry", () -> viewFullEntry(entry)));
     actionsMenu.addOption(new MenuOption("Edit Entry", () -> editEntry(entry)));
     actionsMenu.addOption(new MenuOption("Delete Entry", AnsiColors.RED, () -> deleteEntry(entry)));
