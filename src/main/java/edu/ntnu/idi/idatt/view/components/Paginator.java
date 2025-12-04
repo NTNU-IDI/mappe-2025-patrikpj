@@ -126,6 +126,7 @@ public class Paginator<T> {
     }
 
     System.out.printf("%nTotal: %d item(s)%n", items.size());
+    System.out.println("Choose an option:");
   }
 
   /**
