@@ -5,6 +5,7 @@ import edu.ntnu.idi.idatt.model.entities.DiaryEntry;
 import edu.ntnu.idi.idatt.service.AuthorService;
 import edu.ntnu.idi.idatt.service.DiaryEntryService;
 import edu.ntnu.idi.idatt.view.components.AnsiColors;
+import edu.ntnu.idi.idatt.view.components.InputHelper;
 import edu.ntnu.idi.idatt.view.components.MenuOption;
 import edu.ntnu.idi.idatt.view.components.MenuView;
 import edu.ntnu.idi.idatt.view.components.Paginator;
@@ -21,6 +22,7 @@ public class AuthorController {
   private final AuthorService authorService;
   private final DiaryEntryService entryService;
   private final Scanner scanner;
+  private final InputHelper input;
 
   /**
    * Creates a new AuthorController.
@@ -36,6 +38,7 @@ public class AuthorController {
     this.authorService = Objects.requireNonNull(authorService, "AuthorService cannot be null");
     this.entryService = Objects.requireNonNull(entryService, "DiaryEntryService cannot be null");
     this.scanner = Objects.requireNonNull(scanner, "Scanner cannot be null");
+    this.input = new InputHelper(scanner);
   }
 
   /**
@@ -74,34 +77,34 @@ public class AuthorController {
    * Prompts user to create a new author.
    */
   private void createAuthor() {
-    System.out.println("\n== Create Author ==");
+    input.info("\n== Create Author ==");
 
-    String firstName = promptInput("First name: ");
+    String firstName = input.prompt("First name: ");
     if (firstName.isBlank()) {
-      System.out.println("Cancelled.");
+      input.info("Cancelled.");
       return;
     }
 
-    String lastName = promptInput("Last name: ");
+    String lastName = input.prompt("Last name: ");
     if (lastName.isBlank()) {
-      System.out.println("Cancelled.");
+      input.info("Cancelled.");
       return;
     }
 
     String email = promptUniqueEmail();
     if (email == null) {
-      System.out.println("Cancelled.");
+      input.info("Cancelled.");
       return;
     }
 
     try {
       Optional<Author> result = authorService.createAuthor(firstName, lastName, email);
       result.ifPresentOrElse(
-          author -> System.out.println(AnsiColors.GREEN + "Created: " + author + AnsiColors.RESET),
-          () -> System.out.println(AnsiColors.RED + "Email already exists." + AnsiColors.RESET)
+          author -> input.success("Created: " + author),
+          () -> input.error("Email already exists.")
       );
     } catch (IllegalArgumentException e) {
-      System.out.println(AnsiColors.RED + "Error: " + e.getMessage() + AnsiColors.RESET);
+      input.error("Error: " + e.getMessage());
     }
   }
 
@@ -109,16 +112,16 @@ public class AuthorController {
    * Finds an author by email.
    */
   private void findByEmail() {
-    System.out.println("\n== Find Author by Email ==");
+    input.info("\n== Find Author by Email ==");
 
-    String email = promptInput("Email: ");
+    String email = input.prompt("Email: ");
     if (email.isBlank()) {
       return;
     }
 
     authorService.findByEmail(email).ifPresentOrElse(
         this::showAuthorActions,
-        () -> System.out.println("Author not found.")
+        () -> input.info("Author not found.")
     );
   }
 
@@ -128,7 +131,7 @@ public class AuthorController {
    * @param author the selected author
    */
   private void showAuthorActions(Author author) {
-    MenuView actionsMenu = new MenuView("== " + "Author: " + author.getFullName() + " ==", scanner);
+    MenuView actionsMenu = new MenuView("== Author: " + author.getFullName() + " ==", scanner);
     actionsMenu.addOption(new MenuOption("View Details", () -> viewDetails(author)));
     actionsMenu.addOption(new MenuOption("View Entries", () -> viewEntriesByAuthor(author)));
     actionsMenu.addOption(new MenuOption("Edit Author", () -> editAuthor(author)));
@@ -142,14 +145,16 @@ public class AuthorController {
    * @param author the author
    */
   private void viewDetails(Author author) {
-    System.out.println("\n== Author Details ==");
-    System.out.println("Name:    " + author.getFullName());
-    System.out.println("Email:   " + author.getEmail());
-    System.out.println("Created: " + author.getCreatedAt());
-    System.out.println("Updated: " + author.getUpdatedAt());
+    input.info("\n== Author Details ==");
+    input.info("Name:    " + author.getFullName());
+    input.info("Email:   " + author.getEmail());
+    input.info("Created: " + author.getCreatedAt());
+    input.info("Updated: " + author.getUpdatedAt());
 
     long entryCount = entryService.countByAuthorId(author.getId());
-    System.out.println("Entries: " + entryCount);
+    input.info("Entries: " + entryCount);
+
+    input.pause();
   }
 
   /**
@@ -164,7 +169,7 @@ public class AuthorController {
         entries,
         scanner,
         "Entries by " + author.getFullName(),
-        entry -> entry.getTitle() + " - " + truncate(entry.getContent(), 40)
+        entry -> entry.getTitle() + " - " + input.truncate(entry.getContent(), 40)
     );
 
     paginator.showReadOnly();
@@ -176,39 +181,36 @@ public class AuthorController {
    * @param author the author to edit
    */
   private void editAuthor(Author author) {
-    System.out.println("\n== Edit Author: " + author.getFullName() + " ==");
-    System.out.println("(Leave empty to keep current value)\n");
+    input.info("\n== Edit Author: " + author.getFullName() + " ==");
+    input.info("(Leave empty to keep current value)\n");
 
     boolean changed = false;
 
     // First name
-    System.out.print("First name [" + author.getFirstName() + "]: ");
-    String firstName = scanner.nextLine().trim();
+    String firstName = input.prompt("First name [" + author.getFirstName() + "]: ");
     if (!firstName.isEmpty() && !firstName.equals(author.getFirstName())) {
       try {
         author.setFirstName(firstName);
         changed = true;
       } catch (IllegalArgumentException e) {
-        System.out.println(AnsiColors.RED + e.getMessage() + AnsiColors.RESET);
+        input.error(e.getMessage());
       }
     }
 
     // Last name
-    System.out.print("Last name [" + author.getLastName() + "]: ");
-    String lastName = scanner.nextLine().trim();
+    String lastName = input.prompt("Last name [" + author.getLastName() + "]: ");
     if (!lastName.isEmpty() && !lastName.equals(author.getLastName())) {
       try {
         author.setLastName(lastName);
         changed = true;
       } catch (IllegalArgumentException e) {
-        System.out.println(AnsiColors.RED + e.getMessage() + AnsiColors.RESET);
+        input.error(e.getMessage());
       }
     }
 
     // Email
     while (true) {
-      System.out.print("Email [" + author.getEmail() + "]: ");
-      String email = scanner.nextLine().trim();
+      String email = input.prompt("Email [" + author.getEmail() + "]: ");
 
       if (email.isEmpty()) {
         break; // Keep current value
@@ -219,12 +221,12 @@ public class AuthorController {
       }
 
       if (!Author.isValidEmail(email)) {
-        System.out.println(AnsiColors.RED + "Invalid email format." + AnsiColors.RESET);
+        input.error("Invalid email format.");
         continue;
       }
 
       if (authorService.emailExists(email)) {
-        System.out.println(AnsiColors.RED + "Email already in use." + AnsiColors.RESET);
+        input.error("Email already in use.");
         continue;
       }
 
@@ -235,9 +237,9 @@ public class AuthorController {
 
     if (changed) {
       authorService.update(author);
-      System.out.println(AnsiColors.GREEN + "Author updated: " + author + AnsiColors.RESET);
+      input.success("Author updated: " + author);
     } else {
-      System.out.println("No changes made.");
+      input.info("No changes made.");
     }
   }
 
@@ -250,16 +252,15 @@ public class AuthorController {
     long entryCount = entryService.countByAuthorId(author.getId());
 
     if (entryCount > 0) {
-      System.out.println(AnsiColors.RED + "\nCannot delete: author has " + entryCount
-          + " entries." + AnsiColors.RESET);
+      input.error("\nCannot delete: author has " + entryCount + " entries.");
       return;
     }
 
-    if (confirm("Delete " + author.getFullName() + "?")) {
+    if (input.confirm("Delete " + author.getFullName() + "?")) {
       authorService.delete(author);
-      System.out.println(AnsiColors.GREEN + "Author deleted." + AnsiColors.RESET);
+      input.success("Author deleted.");
     } else {
-      System.out.println("Cancelled.");
+      input.info("Cancelled.");
     }
   }
 
@@ -270,23 +271,23 @@ public class AuthorController {
    */
   private String promptUniqueEmail() {
     while (true) {
-      String email = promptInput("Email: ");
+      String email = input.prompt("Email: ");
 
       if (email.isBlank()) {
         return null;
       }
 
       if (!Author.isValidEmail(email)) {
-        System.out.println(AnsiColors.RED + "Invalid email format." + AnsiColors.RESET);
-        if (!confirm("Try again?")) {
+        input.error("Invalid email format.");
+        if (!input.confirm("Try again?")) {
           return null;
         }
         continue;
       }
 
       if (authorService.emailExists(email)) {
-        System.out.println(AnsiColors.RED + "Email already exists." + AnsiColors.RESET);
-        if (!confirm("Try again?")) {
+        input.error("Email already exists.");
+        if (!input.confirm("Try again?")) {
           return null;
         }
         continue;
@@ -294,42 +295,5 @@ public class AuthorController {
 
       return email;
     }
-  }
-
-  /**
-   * Prompts for input.
-   *
-   * @param prompt the prompt message
-   * @return the user input (trimmed)
-   */
-  private String promptInput(String prompt) {
-    System.out.print(prompt);
-    return scanner.nextLine().trim();
-  }
-
-  /**
-   * Prompts for yes/no confirmation.
-   *
-   * @param message the confirmation message
-   * @return true if user confirms
-   */
-  private boolean confirm(String message) {
-    System.out.print(message + " (y/n): ");
-    String input = scanner.nextLine().trim().toLowerCase();
-    return input.equals("y") || input.equals("yes");
-  }
-
-  /**
-   * Truncates a string to the specified length.
-   *
-   * @param text      the text to truncate
-   * @param maxLength the maximum length
-   * @return the truncated text
-   */
-  private String truncate(String text, int maxLength) {
-    if (text.length() <= maxLength) {
-      return text;
-    }
-    return text.substring(0, maxLength) + "...";
   }
 }

@@ -5,6 +5,7 @@ import edu.ntnu.idi.idatt.model.entities.DiaryEntry;
 import edu.ntnu.idi.idatt.service.AuthorService;
 import edu.ntnu.idi.idatt.service.DiaryEntryService;
 import edu.ntnu.idi.idatt.view.components.AnsiColors;
+import edu.ntnu.idi.idatt.view.components.InputHelper;
 import edu.ntnu.idi.idatt.view.components.MenuOption;
 import edu.ntnu.idi.idatt.view.components.MenuView;
 import edu.ntnu.idi.idatt.view.components.Paginator;
@@ -20,6 +21,7 @@ public class DiaryEntryController {
   private final DiaryEntryService entryService;
   private final AuthorService authorService;
   private final Scanner scanner;
+  private final InputHelper input;
 
   /**
    * Creates a new DiaryEntryController.
@@ -35,6 +37,7 @@ public class DiaryEntryController {
     this.entryService = Objects.requireNonNull(entryService, "DiaryEntryService cannot be null");
     this.authorService = Objects.requireNonNull(authorService, "AuthorService cannot be null");
     this.scanner = Objects.requireNonNull(scanner, "Scanner cannot be null");
+    this.input = new InputHelper(scanner);
   }
 
   /**
@@ -73,13 +76,13 @@ public class DiaryEntryController {
    * Creates a new diary entry.
    */
   private void createEntry() {
-    System.out.println("\n== Create Entry ==");
+    input.info("\n== Create Entry ==");
 
     // Select author
     List<Author> authors = authorService.findAll();
     if (authors.isEmpty()) {
-      System.out.println(AnsiColors.YELLOW + "No authors found." + AnsiColors.RESET);
-      if (confirm("Create an author now?")) {
+      input.warning("No authors found.");
+      if (input.confirm("Create an author now?")) {
         Author newAuthor = createAuthorInline();
         if (newAuthor == null) {
           return;
@@ -90,7 +93,7 @@ public class DiaryEntryController {
       }
     }
 
-    System.out.println("\nSelect an author:");
+    input.info("\nSelect an author:");
     Paginator<Author> authorPaginator = new Paginator<>(
         authors,
         scanner,
@@ -100,36 +103,29 @@ public class DiaryEntryController {
 
     Author author = authorPaginator.show();
     if (author == null) {
-      System.out.println("Cancelled.");
+      input.info("Cancelled.");
       return;
     }
 
     // Enter title
-    String title = promptInput("Title: ");
+    String title = input.prompt("Title: ");
     if (title.isBlank()) {
-      System.out.println("Cancelled.");
+      input.info("Cancelled.");
       return;
     }
 
     // Enter content
-    System.out.println("Content (enter empty line to finish):");
-    StringBuilder contentBuilder = new StringBuilder();
-    String line;
-    while (!(line = scanner.nextLine()).isEmpty()) {
-      contentBuilder.append(line).append("\n");
-    }
-
-    String content = contentBuilder.toString().trim();
-    if (content.isEmpty()) {
-      System.out.println("Cancelled - content cannot be empty.");
+    String content = input.readMultilineContent("Content (enter empty line to finish):");
+    if (content == null) {
+      input.info("Cancelled - content cannot be empty.");
       return;
     }
 
     try {
       DiaryEntry entry = entryService.createEntry(title, author, content);
-      System.out.println(AnsiColors.GREEN + "Created: " + entry + AnsiColors.RESET);
+      input.success("Created: " + entry);
     } catch (IllegalArgumentException e) {
-      System.out.println(AnsiColors.RED + "Error: " + e.getMessage() + AnsiColors.RESET);
+      input.error("Error: " + e.getMessage());
     }
   }
 
@@ -137,9 +133,9 @@ public class DiaryEntryController {
    * Searches entries by title or content.
    */
   private void searchEntries() {
-    System.out.println("\n== Search Entries ==");
+    input.info("\n== Search Entries ==");
 
-    String searchTerm = promptInput("Search term: ");
+    String searchTerm = input.prompt("Search term: ");
     if (searchTerm.isBlank()) {
       return;
     }
@@ -147,7 +143,7 @@ public class DiaryEntryController {
     List<DiaryEntry> results = entryService.search(searchTerm);
 
     if (results.isEmpty()) {
-      System.out.println("No entries found matching: " + searchTerm);
+      input.info("No entries found matching: " + searchTerm);
       return;
     }
 
@@ -170,7 +166,7 @@ public class DiaryEntryController {
    * @param entry the selected entry
    */
   private void showEntryActions(DiaryEntry entry) {
-    MenuView actionsMenu = new MenuView("== " + "Entry: " + entry.getTitle() + " ==", scanner);
+    MenuView actionsMenu = new MenuView("== Entry: " + entry.getTitle() + " ==", scanner);
     actionsMenu.addOption(new MenuOption("View Full Entry", () -> viewFullEntry(entry)));
     actionsMenu.addOption(new MenuOption("Edit Entry", () -> editEntry(entry)));
     actionsMenu.addOption(new MenuOption("Delete Entry", AnsiColors.RED, () -> deleteEntry(entry)));
@@ -183,16 +179,16 @@ public class DiaryEntryController {
    * @param entry the entry to display
    */
   private void viewFullEntry(DiaryEntry entry) {
-    System.out.println("\n" + "=".repeat(50));
-    System.out.println("Title:   " + entry.getTitle());
-    System.out.println("Author:  " + entry.getAuthor().getFullName());
-    System.out.println("Created: " + entry.getCreatedAt());
-    System.out.println("Updated: " + entry.getUpdatedAt());
-    System.out.println("=".repeat(50));
-    System.out.println("\n" + entry.getContent());
-    System.out.println("\n" + "=".repeat(50));
+    input.info("\n" + "=".repeat(50));
+    input.info("Title:   " + entry.getTitle());
+    input.info("Author:  " + entry.getAuthor().getFullName());
+    input.info("Created: " + entry.getCreatedAt());
+    input.info("Updated: " + entry.getUpdatedAt());
+    input.info("=".repeat(50));
+    input.info("\n" + entry.getContent());
+    input.info("\n" + "=".repeat(50));
 
-    promptInput("\nPress Enter to continue...");
+    input.pause();
   }
 
   /**
@@ -201,52 +197,42 @@ public class DiaryEntryController {
    * @param entry the entry to edit
    */
   private void editEntry(DiaryEntry entry) {
-    System.out.println("\n== Edit Entry: " + entry.getTitle() + " ==");
-    System.out.println("(Leave empty to keep current value)\n");
+    input.info("\n== Edit Entry: " + entry.getTitle() + " ==");
+    input.info("(Leave empty to keep current value)\n");
 
     boolean changed = false;
 
     // Edit title
-    System.out.print("Title [" + entry.getTitle() + "]: ");
-    String title = scanner.nextLine().trim();
+    String title = input.prompt("Title [" + entry.getTitle() + "]: ");
     if (!title.isEmpty() && !title.equals(entry.getTitle())) {
       try {
         entry.setTitle(title);
         changed = true;
       } catch (IllegalArgumentException e) {
-        System.out.println(AnsiColors.RED + e.getMessage() + AnsiColors.RESET);
+        input.error(e.getMessage());
       }
     }
 
     // Edit content
-    System.out.println("\nCurrent content preview: " + truncate(entry.getContent(), 100));
-    System.out.print("Replace content? (y/n): ");
-    String replaceContent = scanner.nextLine().trim().toLowerCase();
+    input.info("\nCurrent content preview: " + input.truncate(entry.getContent(), 100));
 
-    if (replaceContent.equals("y") || replaceContent.equals("yes")) {
-      System.out.println("New content (enter empty line to finish):");
-      StringBuilder contentBuilder = new StringBuilder();
-      String line;
-      while (!(line = scanner.nextLine()).isEmpty()) {
-        contentBuilder.append(line).append("\n");
-      }
-
-      String newContent = contentBuilder.toString().trim();
-      if (!newContent.isEmpty()) {
+    if (input.confirm("Replace content?")) {
+      String newContent = input.readMultilineContent("New content (enter empty line to finish):");
+      if (newContent != null) {
         try {
           entry.setContent(newContent);
           changed = true;
         } catch (IllegalArgumentException e) {
-          System.out.println(AnsiColors.RED + e.getMessage() + AnsiColors.RESET);
+          input.error(e.getMessage());
         }
       }
     }
 
     if (changed) {
       entryService.update(entry);
-      System.out.println(AnsiColors.GREEN + "Entry updated." + AnsiColors.RESET);
+      input.success("Entry updated.");
     } else {
-      System.out.println("No changes made.");
+      input.info("No changes made.");
     }
   }
 
@@ -256,35 +242,12 @@ public class DiaryEntryController {
    * @param entry the entry to delete
    */
   private void deleteEntry(DiaryEntry entry) {
-    if (confirm("Delete entry '" + entry.getTitle() + "'?")) {
+    if (input.confirm("Delete entry '" + entry.getTitle() + "'?")) {
       entryService.delete(entry);
-      System.out.println(AnsiColors.GREEN + "Entry deleted." + AnsiColors.RESET);
+      input.success("Entry deleted.");
     } else {
-      System.out.println("Cancelled.");
+      input.info("Cancelled.");
     }
-  }
-
-  /**
-   * Prompts for input.
-   *
-   * @param prompt the prompt message
-   * @return the user input (trimmed)
-   */
-  private String promptInput(String prompt) {
-    System.out.print(prompt);
-    return scanner.nextLine().trim();
-  }
-
-  /**
-   * Prompts for yes/no confirmation.
-   *
-   * @param message the confirmation message
-   * @return true if user confirms
-   */
-  private boolean confirm(String message) {
-    System.out.print(message + " (y/n): ");
-    String input = scanner.nextLine().trim().toLowerCase();
-    return input.equals("y") || input.equals("yes");
   }
 
   /**
@@ -293,45 +256,30 @@ public class DiaryEntryController {
    * @return the created author, or null if cancelled
    */
   private Author createAuthorInline() {
-    System.out.println("\n== Quick Author Creation ==");
+    input.info("\n== Quick Author Creation ==");
 
-    String firstName = promptInput("First name: ");
+    String firstName = input.prompt("First name: ");
     if (firstName.isBlank()) {
-      System.out.println("Cancelled.");
+      input.info("Cancelled.");
       return null;
     }
 
-    String lastName = promptInput("Last name: ");
+    String lastName = input.prompt("Last name: ");
     if (lastName.isBlank()) {
-      System.out.println("Cancelled.");
+      input.info("Cancelled.");
       return null;
     }
 
-    String email = promptInput("Email: ");
+    String email = input.prompt("Email: ");
     if (email.isBlank()) {
-      System.out.println("Cancelled.");
+      input.info("Cancelled.");
       return null;
     }
 
     return authorService.createAuthor(firstName, lastName, email)
         .orElseGet(() -> {
-          System.out.println(AnsiColors.RED + "Email already exists." + AnsiColors.RESET);
+          input.error("Email already exists.");
           return null;
         });
-  }
-
-  /**
-   * Truncates a string to the specified length.
-   *
-   * @param text      the text to truncate
-   * @param maxLength the maximum length
-   * @return the truncated text
-   */
-  private String truncate(String text, int maxLength) {
-    String singleLine = text.replace("\n", " ");
-    if (singleLine.length() <= maxLength) {
-      return singleLine;
-    }
-    return singleLine.substring(0, maxLength) + "...";
   }
 }
