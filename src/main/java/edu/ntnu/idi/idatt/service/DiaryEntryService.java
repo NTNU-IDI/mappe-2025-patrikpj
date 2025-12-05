@@ -96,6 +96,17 @@ public class DiaryEntryService {
   }
 
   /**
+   * Finds all diary entries created on a specific date.
+   *
+   * @param date the date to search for
+   * @return a list of entries created on that date
+   * @throws NullPointerException if date is null
+   */
+  public List<DiaryEntry> findByDate(java.time.LocalDate date) {
+    return entryRepository.findByDate(date);
+  }
+
+  /**
    * Updates a diary entry's title.
    *
    * @param entry    the entry to update

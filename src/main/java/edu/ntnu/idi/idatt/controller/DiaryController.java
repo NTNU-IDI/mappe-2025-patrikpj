@@ -10,6 +10,9 @@ import edu.ntnu.idi.idatt.view.diary.DiaryEntryView;
 import edu.ntnu.idi.idatt.view.diary.ListDiaryEntryView;
 import edu.ntnu.idi.idatt.view.diary.SearchEntriesView;
 import java.io.PrintStream;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Scanner;
 
@@ -319,11 +322,85 @@ public class DiaryController {
   /**
    * Search entries by date.
    */
+  private static final DateTimeFormatter DATE_INPUT_FORMAT = 
+      DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+  /**
+   * Search entries by date.
+   *
+   * @param in  Scanner for user input
+   * @param out PrintStream for output
+   * @return the next action to execute
+   */
   private Action searchByDate(Scanner in, PrintStream out) {
-    searchEntriesView.showNotImplemented("Search by date", out);
-    searchEntriesView.promptContinue(out);
-    in.nextLine();
-    return this::searchEntries;
+    searchEntriesView.renderDateSearch(out);
+
+    while (true) {
+      searchEntriesView.promptDate(out);
+      String input = in.nextLine().trim();
+
+      if (input.isBlank()) {
+        return this::searchEntries;
+      }
+
+      // Parse the date
+      LocalDate date;
+      try {
+        date = LocalDate.parse(input, DATE_INPUT_FORMAT);
+      } catch (DateTimeParseException e) {
+        searchEntriesView.showInvalidDateFormat(out);
+        continue;
+      }
+
+      List<DiaryEntry> results = diaryEntryService.findByDate(date);
+
+      if (results.isEmpty()) {
+        searchEntriesView.showNoResultsForDate(input, out);
+        searchEntriesView.promptContinue(out);
+        in.nextLine();
+        return this::searchEntries;
+      }
+
+      // Show results
+      return (in2, out2) -> showDateResults(results, input, in2, out2);
+    }
+  }
+
+  /**
+   * Shows date search results and handles selection.
+   *
+   * @param results the search results
+   * @param dateStr the date string that was searched
+   * @param in      Scanner for user input
+   * @param out     PrintStream for output
+   * @return the next action to execute
+   */
+  private Action showDateResults(List<DiaryEntry> results, String dateStr,
+      Scanner in, PrintStream out) {
+    listEntryView.renderDateResults(results, dateStr, out);
+
+    while (true) {
+      String choice = in.nextLine().trim().toLowerCase();
+
+      if (choice.equals("b")) {
+        return this::searchEntries;
+      }
+
+      // Try to parse as number for entry selection
+      try {
+        int index = Integer.parseInt(choice) - 1;
+        if (index >= 0 && index < results.size()) {
+          DiaryEntry selected = results.get(index);
+          return (in2, out2) -> showEntryDetail(selected,
+              (in3, out3) -> showDateResults(results, dateStr, in3, out3), in2, out2);
+        }
+      } catch (NumberFormatException ignored) {
+        // Fall through to error
+      }
+
+      listEntryView.showError("Invalid selection. Try again.", out);
+      listEntryView.prompt(out);
+    }
   }
 
   /**
