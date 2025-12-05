@@ -22,6 +22,7 @@ import edu.ntnu.idi.idatt.view.diary.DiaryEntriesView;
 import edu.ntnu.idi.idatt.view.diary.DiaryEntryView;
 import edu.ntnu.idi.idatt.view.diary.ListDiaryEntryView;
 import edu.ntnu.idi.idatt.view.mainmenu.MainMenuView;
+import edu.ntnu.idi.idatt.view.statistics.StatisticsView;
 import java.io.PrintStream;
 import java.util.Scanner;
 import org.hibernate.SessionFactory;
@@ -63,6 +64,7 @@ public class DiaryApp {
     private ListDiaryEntryView listDiaryEntryView;
     private DiaryEntryView diaryEntryView;
     private CreateDiaryEntryView createDiaryEntryView;
+    private StatisticsView statisticsView;
 
     // Controllers
     private MainMenuController mainMenuController;
@@ -102,9 +104,10 @@ public class DiaryApp {
         this.listDiaryEntryView = new ListDiaryEntryView();
         this.diaryEntryView = new DiaryEntryView();
         this.createDiaryEntryView = new CreateDiaryEntryView();
+        this.statisticsView = new StatisticsView();
 
         // Controllers
-        this.mainMenuController = new MainMenuController(mainMenuView);
+        this.mainMenuController = new MainMenuController(mainMenuView, statisticsService, statisticsView);
         this.authorController = new AuthorController(authorService, authorMenuView, 
                 listAuthorView, authorView, createAuthorView, findAuthorView, editAuthorView);
         this.diaryController = new DiaryController(diaryEntryService, authorService,

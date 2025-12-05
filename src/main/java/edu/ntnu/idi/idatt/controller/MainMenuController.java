@@ -1,6 +1,8 @@
 package edu.ntnu.idi.idatt.controller;
 
+import edu.ntnu.idi.idatt.service.StatisticsService;
 import edu.ntnu.idi.idatt.view.mainmenu.MainMenuView;
+import edu.ntnu.idi.idatt.view.statistics.StatisticsView;
 import java.io.PrintStream;
 import java.util.Scanner;
 
@@ -11,6 +13,8 @@ import java.util.Scanner;
 public class MainMenuController {
 
     private final MainMenuView view;
+    private final StatisticsService statisticsService;
+    private final StatisticsView statisticsView;
     
     // Navigation references (set via setters to avoid circular dependency)
     private DiaryController diaryController;
@@ -19,10 +23,15 @@ public class MainMenuController {
     /**
      * Creates a new MainMenuController.
      *
-     * @param view the main menu view
+     * @param view              the main menu view
+     * @param statisticsService the statistics service
+     * @param statisticsView    the statistics view
      */
-    public MainMenuController(MainMenuView view) {
+    public MainMenuController(MainMenuView view, StatisticsService statisticsService, 
+                              StatisticsView statisticsView) {
         this.view = view;
+        this.statisticsService = statisticsService;
+        this.statisticsView = statisticsView;
     }
 
     /**
@@ -70,13 +79,28 @@ public class MainMenuController {
     }
 
     /**
-     * Shows statistics (placeholder).
+     * Shows statistics.
+     *
+     * @param in  Scanner for user input
+     * @param out PrintStream for output
+     * @return the next action to execute
      */
     private Action showStatistics(Scanner in, PrintStream out) {
-        view.showNotImplemented("Statistics", out);
-        view.promptContinue(out);
-        in.nextLine();
-        return this::showMenu;
+        statisticsView.render(
+            statisticsService.getTotalAuthors(),
+            statisticsService.getTotalEntries(),
+            statisticsService.getEntriesPerAuthor(),
+            out
+        );
+
+        while (true) {
+            String choice = in.nextLine().trim().toLowerCase();
+            if (choice.equals("b")) {
+                return this::showMenu;
+            }
+            statisticsView.showError("Invalid selection. Try again.", out);
+            statisticsView.prompt(out);
+        }
     }
 }
 
