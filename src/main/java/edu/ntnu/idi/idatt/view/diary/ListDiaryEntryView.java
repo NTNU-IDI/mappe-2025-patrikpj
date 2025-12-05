@@ -41,6 +41,35 @@ public class ListDiaryEntryView implements BaseView {
       }
     }
 
+    out.println();
+    ConsoleFormatter.dangerItem("b", "Back", out);
+    ConsoleFormatter.prompt(out);
+  }
+
+  /**
+   * Renders search results with the keyword shown.
+   *
+   * @param entries the list of matching entries
+   * @param keyword the keyword that was searched
+   * @param out     the output stream
+   */
+  public void renderSearchResults(List<DiaryEntry> entries, String keyword, PrintStream out) {
+    out.println(AnsiColors.CLEAR_SCREEN);
+    ConsoleFormatter.title("Search Results", out);
+
+    out.println("Found " + entries.size() + " entries matching \"" + keyword + "\":");
+    out.println();
+
+    int index = 1;
+    for (DiaryEntry entry : entries) {
+      String dateStr = entry.getCreatedAt().format(DATE_FORMAT);
+      String summary = entry.getTitle() + " - "
+          + ConsoleFormatter.coloredText(entry.getAuthor().getFullName(), AnsiColors.CYAN)
+          + " (" + dateStr + ")";
+      ConsoleFormatter.menuItem(String.valueOf(index++), summary, out);
+    }
+
+    out.println();
     ConsoleFormatter.dangerItem("b", "Back", out);
     ConsoleFormatter.prompt(out);
   }

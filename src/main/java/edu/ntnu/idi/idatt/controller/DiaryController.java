@@ -251,12 +251,69 @@ public class DiaryController {
 
   /**
    * Search entries by keyword.
+   *
+   * @param in  Scanner for user input
+   * @param out PrintStream for output
+   * @return the next action to execute
    */
   private Action searchByKeyword(Scanner in, PrintStream out) {
-    searchEntriesView.showNotImplemented("Search by keyword", out);
-    searchEntriesView.promptContinue(out);
-    in.nextLine();
-    return this::searchEntries;
+    searchEntriesView.renderKeywordSearch(out);
+    searchEntriesView.promptKeyword(out);
+    String keyword = in.nextLine().trim();
+
+    if (keyword.isBlank()) {
+      return this::searchEntries;
+    }
+
+    List<DiaryEntry> results = diaryEntryService.search(keyword);
+
+    if (results.isEmpty()) {
+      searchEntriesView.showNoResults(keyword, out);
+      searchEntriesView.promptContinue(out);
+      in.nextLine();
+      return this::searchEntries;
+    }
+
+    // Show results
+    return (in2, out2) -> showSearchResults(results, keyword, in2, out2);
+  }
+
+  /**
+   * Shows search results and handles selection.
+   *
+   * @param results the search results
+   * @param keyword the keyword that was searched
+   * @param in      Scanner for user input
+   * @param out     PrintStream for output
+   * @return the next action to execute
+   */
+  private Action showSearchResults(List<DiaryEntry> results, String keyword, 
+      Scanner in, PrintStream out) {
+    listEntryView.renderSearchResults(results, keyword, out);
+
+    while (true) {
+      String choice = in.nextLine().trim().toLowerCase();
+
+      if (choice.equals("b")) {
+        return this::searchEntries;
+      }
+
+      // Try to parse as number for entry selection
+      try {
+        int index = Integer.parseInt(choice) - 1;
+        if (index >= 0 && index < results.size()) {
+          DiaryEntry selected = results.get(index);
+          // Back from detail should return to search results
+          return (in2, out2) -> showEntryDetail(selected, 
+              (in3, out3) -> showSearchResults(results, keyword, in3, out3), in2, out2);
+        }
+      } catch (NumberFormatException ignored) {
+        // Fall through to error
+      }
+
+      listEntryView.showError("Invalid selection. Try again.", out);
+      listEntryView.prompt(out);
+    }
   }
 
   /**
