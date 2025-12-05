@@ -1,4 +1,4 @@
-package edu.ntnu.idi.idatt.view.components;
+package edu.ntnu.idi.idatt.view._components;
 
 /**
  * Generates and displays the colored ASCII banner for the Diary System.

@@ -13,6 +13,7 @@ public class MenuView {
   private final List<MenuOption> options = new ArrayList<>();
   private final Scanner scanner;
   private final boolean isMainMenu;
+  private final InputHelper input;
   private boolean running = true;
 
   /**
@@ -26,6 +27,7 @@ public class MenuView {
     this.title = title;
     this.scanner = scanner;
     this.isMainMenu = isMainMenu;
+    this.input = new InputHelper(scanner);
   }
 
   /**
@@ -55,16 +57,16 @@ public class MenuView {
 
     while (running) {
       printMenu();
-      
-      String input;
+
+      String userInput;
       try {
-        input = scanner.nextLine();
+        userInput = scanner.nextLine().trim();
       } catch (Exception e) {
         System.out.println("Input stream closed. Exiting...");
         return;
       }
 
-      handleInput(input);
+      handleInput(userInput);
     }
   }
 
@@ -88,13 +90,11 @@ public class MenuView {
       );
     }
 
-    // Print auto back/exit option
-    int backNumber = options.size() + 1;
+    // Print back/exit option using 'B' (consistent with Paginator)
     String backLabel = isMainMenu ? "Exit" : "Back";
     System.out.printf(
-        "[%s%d%s] - %s%n",
+        "[%sB%s] - %s%n",
         AnsiColors.RED,
-        backNumber,
         AnsiColors.RESET,
         backLabel
     );
@@ -105,33 +105,45 @@ public class MenuView {
   /**
    * Handles user input and executes the selected option.
    *
-   * @param input the user input
+   * @param userInput the user input
    */
-  private void handleInput(String input) {
-    try {
-      int choice = Integer.parseInt(input);
-      int backNumber = options.size() + 1;
+  private void handleInput(String userInput) {
+    // Check for back/exit command
+    if (userInput.equalsIgnoreCase("b")) {
+      handleBackOrExit();
+      return;
+    }
 
-      if (choice < 1 || choice > backNumber) {
-        System.out.println("Invalid input");
-      } else if (choice == backNumber) {
-        // Back/Exit selected
-        if (isMainMenu) {
-          System.out.println("Goodbye!");
-          System.exit(0);
-        } else {
-          running = false;  // Exit this menu, return to parent
-        }
+    // Try to parse as number for option selection
+    try {
+      int choice = Integer.parseInt(userInput);
+
+      if (choice < 1 || choice > options.size()) {
+        input.error("Invalid option. Please enter 1-" + options.size() + " or B.");
       } else {
         options.get(choice - 1).execute();
       }
     } catch (NumberFormatException e) {
-      System.out.println("Invalid input");
+      input.error("Invalid input. Please enter a number or B.");
     }
   }
 
   /**
-   * Stops the menu loop.
+   * Handles the back or exit action.
+   */
+  private void handleBackOrExit() {
+    if (isMainMenu) {
+      if (input.confirm("Are you sure you want to exit?")) {
+        System.out.println("Goodbye!");
+        System.exit(0);
+      }
+    } else {
+      running = false;
+    }
+  }
+
+  /**
+   * Stops the menu loop. Call this to close the menu from an action.
    */
   public void close() {
     running = false;

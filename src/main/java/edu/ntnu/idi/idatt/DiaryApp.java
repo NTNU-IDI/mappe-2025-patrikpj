@@ -1,119 +1,147 @@
 package edu.ntnu.idi.idatt;
 
+import edu.ntnu.idi.idatt.controller.Action;
+import edu.ntnu.idi.idatt.controller.Router;
 import edu.ntnu.idi.idatt.controller.AuthorController;
-import edu.ntnu.idi.idatt.controller.DiaryEntryController;
+import edu.ntnu.idi.idatt.controller.DiaryController;
+import edu.ntnu.idi.idatt.controller.MainMenuController;
 import edu.ntnu.idi.idatt.repository.AuthorRepository;
 import edu.ntnu.idi.idatt.repository.DiaryEntryRepository;
 import edu.ntnu.idi.idatt.service.AuthorService;
 import edu.ntnu.idi.idatt.service.DiaryEntryService;
 import edu.ntnu.idi.idatt.service.StatisticsService;
 import edu.ntnu.idi.idatt.util.HibernateUtil;
-import edu.ntnu.idi.idatt.view.components.AnsiColors;
-import edu.ntnu.idi.idatt.view.components.DiarySystemBanner;
-import edu.ntnu.idi.idatt.view.components.InputHelper;
-import edu.ntnu.idi.idatt.view.components.MenuOption;
-import edu.ntnu.idi.idatt.view.components.MenuView;
+import edu.ntnu.idi.idatt.view.author.AuthorMenuView;
+import edu.ntnu.idi.idatt.view.author.AuthorView;
+import edu.ntnu.idi.idatt.view.author.CreateAuthorView;
+import edu.ntnu.idi.idatt.view.author.EditAuthorView;
+import edu.ntnu.idi.idatt.view.author.FindAuthorView;
+import edu.ntnu.idi.idatt.view.author.ListAuthorView;
+import edu.ntnu.idi.idatt.view.diary.CreateDiaryEntryView;
+import edu.ntnu.idi.idatt.view.diary.DiaryEntriesView;
+import edu.ntnu.idi.idatt.view.diary.DiaryEntryView;
+import edu.ntnu.idi.idatt.view.diary.ListDiaryEntryView;
+import edu.ntnu.idi.idatt.view.mainmenu.MainMenuView;
+import java.io.PrintStream;
 import java.util.Scanner;
 import org.hibernate.SessionFactory;
 
 /**
- * Main application class for the Diary System.
+ * Composition root for the Diary application.
+ * <p>
+ * Responsibilities:
+ * - Initialize infrastructure (Hibernate, Scanner)
+ * - Create repositories, services, views, and controllers
+ * - Wire all dependencies together
+ * - Build the initial Action and start the Router loop
+ * - Register shutdown hooks for cleanup
  */
 public class DiaryApp {
 
-  private Scanner scanner;
+    // I/O
+    private Scanner scanner;
+    private PrintStream out;
 
-  // Repositories
-  private AuthorRepository authorRepository;
-  private DiaryEntryRepository diaryEntryRepository;
+    // Repositories
+    private AuthorRepository authorRepository;
+    private DiaryEntryRepository diaryEntryRepository;
 
-  // Services
-  private AuthorService authorService;
-  private DiaryEntryService diaryEntryService;
-  private StatisticsService statisticsService;
+    // Services
+    private AuthorService authorService;
+    private DiaryEntryService diaryEntryService;
+    private StatisticsService statisticsService;
 
-  // Controllers
-  private AuthorController authorController;
-  private DiaryEntryController entryController;
+    // Views
+    private MainMenuView mainMenuView;
+    private AuthorMenuView authorMenuView;
+    private ListAuthorView listAuthorView;
+    private AuthorView authorView;
+    private CreateAuthorView createAuthorView;
+    private FindAuthorView findAuthorView;
+    private EditAuthorView editAuthorView;
+    private DiaryEntriesView diaryEntriesView;
+    private ListDiaryEntryView listDiaryEntryView;
+    private DiaryEntryView diaryEntryView;
+    private CreateDiaryEntryView createDiaryEntryView;
 
-  // View helpers
-  private InputHelper input;
+    // Controllers
+    private MainMenuController mainMenuController;
+    private AuthorController authorController;
+    private DiaryController diaryController;
 
-  // Main menu
-  private MenuView mainMenu;
+    /**
+     * Initializes all application components.
+     * Call this before {@link #start()}.
+     */
+    public void init() {
+        // I/O
+        this.scanner = new Scanner(System.in);
+        this.out = System.out;
 
-  /**
-   * Initializes all application components.
-   */
-  public void init() {
-    // Create scanner
-    this.scanner = new Scanner(System.in);
+        // Initialize Hibernate (fail-fast if config is bad)
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
 
-    // Initialize Hibernate (catches config errors early)
-    SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+        // Repositories
+        this.authorRepository = new AuthorRepository(sessionFactory);
+        this.diaryEntryRepository = new DiaryEntryRepository(sessionFactory);
 
-    // Create repositories
-    this.authorRepository = new AuthorRepository(sessionFactory);
-    this.diaryEntryRepository = new DiaryEntryRepository(sessionFactory);
+        // Services
+        this.authorService = new AuthorService(authorRepository);
+        this.diaryEntryService = new DiaryEntryService(diaryEntryRepository);
+        this.statisticsService = new StatisticsService(authorService, diaryEntryService);
 
-    // Create services
-    this.authorService = new AuthorService(authorRepository);
-    this.diaryEntryService = new DiaryEntryService(diaryEntryRepository);
-    this.statisticsService = new StatisticsService(authorService, diaryEntryService);
-    
-    // Create view helpers
-    this.input = new InputHelper(scanner);
+        // Views
+        this.mainMenuView = new MainMenuView();
+        this.authorMenuView = new AuthorMenuView();
+        this.listAuthorView = new ListAuthorView();
+        this.authorView = new AuthorView();
+        this.createAuthorView = new CreateAuthorView();
+        this.findAuthorView = new FindAuthorView();
+        this.editAuthorView = new EditAuthorView();
+        this.diaryEntriesView = new DiaryEntriesView();
+        this.listDiaryEntryView = new ListDiaryEntryView();
+        this.diaryEntryView = new DiaryEntryView();
+        this.createDiaryEntryView = new CreateDiaryEntryView();
 
-    // Create controllers
-    this.authorController = new AuthorController(authorService, diaryEntryService, scanner);
-    this.entryController = new DiaryEntryController(diaryEntryService, authorService, scanner);
+        // Controllers
+        this.mainMenuController = new MainMenuController(mainMenuView);
+        this.authorController = new AuthorController(authorService, authorMenuView, 
+                listAuthorView, authorView, createAuthorView, findAuthorView, editAuthorView);
+        this.diaryController = new DiaryController(diaryEntryService, authorService,
+                diaryEntriesView, listDiaryEntryView, diaryEntryView, createDiaryEntryView);
 
-    // Build menus
-    buildMenu();
+        // Wire navigation references (setter injection to break circular dependencies)
+        mainMenuController.setAuthorController(authorController);
+        mainMenuController.setDiaryController(diaryController);
+        authorController.setMainMenuController(mainMenuController);
+        diaryController.setMainMenuController(mainMenuController);
 
-    // Register shutdown hook for cleanup on Ctrl+C or exit
-    Runtime.getRuntime().addShutdownHook(new Thread(this::cleanup));
-  }
-
-  /**
-   * Builds the main menu.
-   */
-  private void buildMenu() {
-    this.mainMenu = new MenuView("== Diary System ==", scanner, true);
-
-    mainMenu.addOption(new MenuOption("Diary Entries", entryController.getMenu()));
-    mainMenu.addOption(new MenuOption("Authors", authorController.getMenu()));
-    mainMenu.addOption(new MenuOption("Statistics", AnsiColors.GREEN, this::showStatistics));
-  }
-
-  /**
-   * Starts the application.
-   */
-  public void start() {
-    System.out.println(DiarySystemBanner.getColoredBanner());
-    mainMenu.show();
-  }
-
-  /**
-   * Cleans up resources before exit.
-   */
-  private void cleanup() {
-    if (scanner != null) {
-      scanner.close();
+        // Register shutdown hook for cleanup on Ctrl+C or normal exit
+        Runtime.getRuntime().addShutdownHook(new Thread(this::cleanup));
     }
-    HibernateUtil.shutdown();
-  }
 
-  private void showStatistics() {
-    input.info("\n== Statistics ==");
-    input.info("Total authors: " + statisticsService.getTotalAuthors());
-    input.info("Total entries: " + statisticsService.getTotalEntries());
+    /**
+     * Starts the application:
+     * - Creates the initial action (main menu)
+     * - Hands control to the Router (action loop)
+     */
+    public void start() {
+        // Initial action: show main menu
+        Action initialAction = (in, out) -> mainMenuController.showMenu(in, out);
 
-    input.info("\nEntries per author:");
-    statisticsService.getEntriesPerAuthor().forEach((author, count) ->
-        input.info("  " + author.getFullName() + " - " + count));
+        // Router runs the Action-based TUI loop
+        Router router = new Router(initialAction, scanner, out);
+        router.run();
+    }
 
-    input.pause();
-  }
+    /**
+     * Cleans up resources before exit.
+     * This is called from the shutdown hook and can also be called manually.
+     */
+    private void cleanup() {
+        if (scanner != null) {
+            scanner.close();
+        }
+        HibernateUtil.shutdown();
+    }
 }
-  

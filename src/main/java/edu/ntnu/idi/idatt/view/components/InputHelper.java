@@ -22,6 +22,15 @@ public class InputHelper {
   }
 
   /**
+   * Clears the console screen.
+   * Uses ANSI escape codes which work on most modern terminals.
+   */
+  public void clearScreen() {
+    System.out.print("\033[H\033[2J");
+    System.out.flush();
+  }
+
+  /**
    * Prompts the user for input with the specified message.
    *
    * @param message the prompt message to display
@@ -88,13 +97,14 @@ public class InputHelper {
 
   /**
    * Reads multi-line content from the user.
-   * Input ends when the user enters an empty line.
+   * Input ends when the user presses Enter on an empty line.
    *
    * @param promptMessage the prompt message to display before input
    * @return the content entered, or null if empty/cancelled
    */
   public String readMultilineContent(String promptMessage) {
     System.out.println(promptMessage);
+    System.out.println(AnsiColors.CYAN + "(Press Enter twice to finish)" + AnsiColors.RESET);
     StringBuilder contentBuilder = new StringBuilder();
     String line;
     while (!(line = scanner.nextLine()).isEmpty()) {
@@ -123,4 +133,3 @@ public class InputHelper {
     return singleLine.substring(0, maxLength) + "...";
   }
 }
-

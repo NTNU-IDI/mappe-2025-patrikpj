@@ -1,4 +1,4 @@
-package edu.ntnu.idi.idatt.view.components;
+package edu.ntnu.idi.idatt.view._components;
 
 /**
  * Provides ASCII art for select letters and symbols.
