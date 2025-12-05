@@ -8,14 +8,14 @@ import java.io.PrintStream;
 
 public class MainMenuView implements BaseView {
 
-    public void renderMenu(PrintStream out) {
-        out.println(AnsiColors.CLEAR_SCREEN);
-        out.println(DiarySystemBanner.getColoredBanner());
-        ConsoleFormatter.title("Main Menu", out);
-        ConsoleFormatter.menuItem("1", "Diary Entries [...]", out);
-        ConsoleFormatter.menuItem("2", "Author [...]", out);
-        ConsoleFormatter.menuItem("3", "Statistics", out);
-        ConsoleFormatter.dangerItem("q", "Quit", out);
-        ConsoleFormatter.prompt(out);
-    }
+  public void renderMenu(PrintStream out) {
+    out.println(AnsiColors.CLEAR_SCREEN);
+    out.println(DiarySystemBanner.getColoredBanner());
+    ConsoleFormatter.title("Main Menu", out);
+    ConsoleFormatter.menuItem("1", "Diary Entries [...]", out);
+    ConsoleFormatter.menuItem("2", "Author [...]", out);
+    ConsoleFormatter.menuItem("3", "Statistics", out);
+    ConsoleFormatter.dangerItem("q", "Quit", out);
+    ConsoleFormatter.prompt(out);
+  }
 }

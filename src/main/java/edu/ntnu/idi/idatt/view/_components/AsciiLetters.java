@@ -2,7 +2,7 @@ package edu.ntnu.idi.idatt.view._components;
 
 /**
  * Provides ASCII art for select letters and symbols.
- * 
+ *
  * <p>This is a utility class and should not be instantiated.
  */
 public class AsciiLetters {

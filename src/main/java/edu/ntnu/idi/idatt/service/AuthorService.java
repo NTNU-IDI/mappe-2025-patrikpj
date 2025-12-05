@@ -51,8 +51,8 @@ public class AuthorService {
    * @param email     the author's email
    * @return the created author
    * @throws NullPointerException     if any argument is null
-   * @throws IllegalArgumentException if any argument is blank, email is invalid,
-   *                                  or email is already in use
+   * @throws IllegalArgumentException if any argument is blank, email is invalid, or email is
+   *                                  already in use
    */
   public Author createAuthorOrThrow(String firstName, String lastName, String email) {
     if (authorRepository.existsByEmail(email)) {

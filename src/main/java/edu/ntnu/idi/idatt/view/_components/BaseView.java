@@ -3,8 +3,8 @@ package edu.ntnu.idi.idatt.view._components;
 import java.io.PrintStream;
 
 /**
- * Base interface for all views providing common message display methods.
- * Ensures consistent messaging across the application.
+ * Base interface for all views providing common message display methods. Ensures consistent
+ * messaging across the application.
  */
 public interface BaseView {
 

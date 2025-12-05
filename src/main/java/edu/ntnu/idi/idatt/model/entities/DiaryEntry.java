@@ -180,7 +180,7 @@ public class DiaryEntry {
    */
   @Override
   public String toString() {
-    return "DiaryEntry{id=" + id + ", title='" + title + "', authorId=" 
+    return "DiaryEntry{id=" + id + ", title='" + title + "', authorId="
         + (author != null ? author.getId() : null) + "}";
   }
 

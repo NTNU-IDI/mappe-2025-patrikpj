@@ -14,7 +14,7 @@ public final class HibernateUtil {
 
   static {
     silenceLogging();
-    
+
     try {
       SESSION_FACTORY = new Configuration().configure().buildSessionFactory();
     } catch (Exception e) {

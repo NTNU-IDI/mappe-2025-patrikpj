@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class StatisticsService {
+
   private final AuthorService authorService;
   private final DiaryEntryService diaryEntryService;
 

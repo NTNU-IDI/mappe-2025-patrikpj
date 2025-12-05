@@ -59,7 +59,7 @@ public class Author {
   private LocalDateTime updatedAt;
 
   @OneToMany(mappedBy = "author", cascade = CascadeType.REMOVE, orphanRemoval = true)
-  private List<DiaryEntry> diaryEntries = new ArrayList<>();
+  private final List<DiaryEntry> diaryEntries = new ArrayList<>();
 
   /**
    * Default constructor required by Hibernate.

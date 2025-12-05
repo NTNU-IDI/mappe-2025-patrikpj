@@ -63,7 +63,8 @@ public class DiaryEntryRepository {
    */
   public List<DiaryEntry> findAll() {
     try (Session session = sessionFactory.openSession()) {
-      return session.createQuery("FROM DiaryEntry ORDER BY createdAt DESC", DiaryEntry.class).list();
+      return session.createQuery("FROM DiaryEntry ORDER BY createdAt DESC", DiaryEntry.class)
+          .list();
     }
   }
 
@@ -78,7 +79,7 @@ public class DiaryEntryRepository {
     Objects.requireNonNull(author, "Author cannot be null");
     try (Session session = sessionFactory.openSession()) {
       return session
-          .createQuery("FROM DiaryEntry WHERE author = :author ORDER BY createdAt DESC", 
+          .createQuery("FROM DiaryEntry WHERE author = :author ORDER BY createdAt DESC",
               DiaryEntry.class)
           .setParameter("author", author)
           .list();
@@ -96,7 +97,7 @@ public class DiaryEntryRepository {
     Objects.requireNonNull(authorId, "Author ID cannot be null");
     try (Session session = sessionFactory.openSession()) {
       return session
-          .createQuery("FROM DiaryEntry WHERE author.id = :authorId ORDER BY createdAt DESC", 
+          .createQuery("FROM DiaryEntry WHERE author.id = :authorId ORDER BY createdAt DESC",
               DiaryEntry.class)
           .setParameter("authorId", authorId)
           .list();
@@ -104,8 +105,8 @@ public class DiaryEntryRepository {
   }
 
   /**
-   * Searches for diary entries containing the given text in title or content.
-   * Results are sorted by creation date (newest first).
+   * Searches for diary entries containing the given text in title or content. Results are sorted by
+   * creation date (newest first).
    *
    * @param searchText the text to search for (case-insensitive)
    * @return a list of matching entries (never null)
