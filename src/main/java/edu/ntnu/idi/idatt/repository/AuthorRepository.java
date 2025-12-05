@@ -73,13 +73,13 @@ public class AuthorRepository {
   }
 
   /**
-   * Retrieves all authors from the database.
+   * Retrieves all authors from the database, sorted by creation date (newest first).
    *
    * @return a list of all authors (never null)
    */
   public List<Author> findAll() {
     try (Session session = sessionFactory.openSession()) {
-      return session.createQuery("FROM Author", Author.class).list();
+      return session.createQuery("FROM Author ORDER BY createdAt DESC", Author.class).list();
     }
   }
 

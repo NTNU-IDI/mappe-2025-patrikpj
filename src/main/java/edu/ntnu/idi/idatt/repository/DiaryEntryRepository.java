@@ -57,18 +57,18 @@ public class DiaryEntryRepository {
   }
 
   /**
-   * Retrieves all diary entries from the database.
+   * Retrieves all diary entries from the database, sorted by creation date (newest first).
    *
    * @return a list of all diary entries (never null)
    */
   public List<DiaryEntry> findAll() {
     try (Session session = sessionFactory.openSession()) {
-      return session.createQuery("FROM DiaryEntry", DiaryEntry.class).list();
+      return session.createQuery("FROM DiaryEntry ORDER BY createdAt DESC", DiaryEntry.class).list();
     }
   }
 
   /**
-   * Finds all diary entries by a specific author.
+   * Finds all diary entries by a specific author, sorted by creation date (newest first).
    *
    * @param author the author to search for
    * @return a list of entries by the author (never null)
@@ -78,14 +78,15 @@ public class DiaryEntryRepository {
     Objects.requireNonNull(author, "Author cannot be null");
     try (Session session = sessionFactory.openSession()) {
       return session
-          .createQuery("FROM DiaryEntry WHERE author = :author", DiaryEntry.class)
+          .createQuery("FROM DiaryEntry WHERE author = :author ORDER BY createdAt DESC", 
+              DiaryEntry.class)
           .setParameter("author", author)
           .list();
     }
   }
 
   /**
-   * Finds all diary entries by author ID.
+   * Finds all diary entries by author ID, sorted by creation date (newest first).
    *
    * @param authorId the author ID to search for
    * @return a list of entries by the author (never null)
@@ -95,7 +96,8 @@ public class DiaryEntryRepository {
     Objects.requireNonNull(authorId, "Author ID cannot be null");
     try (Session session = sessionFactory.openSession()) {
       return session
-          .createQuery("FROM DiaryEntry WHERE author.id = :authorId", DiaryEntry.class)
+          .createQuery("FROM DiaryEntry WHERE author.id = :authorId ORDER BY createdAt DESC", 
+              DiaryEntry.class)
           .setParameter("authorId", authorId)
           .list();
     }
@@ -103,6 +105,7 @@ public class DiaryEntryRepository {
 
   /**
    * Searches for diary entries containing the given text in title or content.
+   * Results are sorted by creation date (newest first).
    *
    * @param searchText the text to search for (case-insensitive)
    * @return a list of matching entries (never null)
@@ -114,7 +117,8 @@ public class DiaryEntryRepository {
       String pattern = "%" + searchText.toLowerCase() + "%";
       return session
           .createQuery(
-              "FROM DiaryEntry WHERE LOWER(title) LIKE :pattern OR LOWER(content) LIKE :pattern",
+              "FROM DiaryEntry WHERE LOWER(title) LIKE :pattern OR LOWER(content) LIKE :pattern "
+                  + "ORDER BY createdAt DESC",
               DiaryEntry.class)
           .setParameter("pattern", pattern)
           .list();
