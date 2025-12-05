@@ -6,21 +6,21 @@ import edu.ntnu.idi.idatt.view._components.ConsoleFormatter;
 import java.io.PrintStream;
 
 /**
- * View for the diary entries menu.
+ * View for the search entries menu.
  */
-public class DiaryEntriesView implements BaseView {
+public class SearchEntriesView implements BaseView {
 
   /**
-   * Renders the diary entries menu.
+   * Renders the search entries menu.
    *
    * @param out the output stream
    */
   public void renderMenu(PrintStream out) {
     out.println(AnsiColors.CLEAR_SCREEN);
-    ConsoleFormatter.title("Diary Entries Menu", out);
-    ConsoleFormatter.menuItem("1", "List All Entries", out);
-    ConsoleFormatter.menuItem("2", "Create Entry", out);
-    ConsoleFormatter.menuItem("3", "Search Entries [...]", out);
+    ConsoleFormatter.title("Search Entries", out);
+    ConsoleFormatter.menuItem("1", "Search by keyword", out);
+    ConsoleFormatter.menuItem("2", "Search by date", out);
+    ConsoleFormatter.menuItem("3", "Search by date range", out);
     ConsoleFormatter.dangerItem("b", "Back", out);
     ConsoleFormatter.prompt(out);
   }

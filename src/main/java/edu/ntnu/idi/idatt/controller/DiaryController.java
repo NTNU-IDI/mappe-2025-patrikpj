@@ -8,6 +8,7 @@ import edu.ntnu.idi.idatt.view.diary.CreateDiaryEntryView;
 import edu.ntnu.idi.idatt.view.diary.DiaryEntriesView;
 import edu.ntnu.idi.idatt.view.diary.DiaryEntryView;
 import edu.ntnu.idi.idatt.view.diary.ListDiaryEntryView;
+import edu.ntnu.idi.idatt.view.diary.SearchEntriesView;
 import java.io.PrintStream;
 import java.util.List;
 import java.util.Scanner;
@@ -23,6 +24,7 @@ public class DiaryController {
   private final ListDiaryEntryView listEntryView;
   private final DiaryEntryView entryView;
   private final CreateDiaryEntryView createEntryView;
+  private final SearchEntriesView searchEntriesView;
 
   // Navigation reference
   private MainMenuController mainMenuController;
@@ -30,25 +32,28 @@ public class DiaryController {
   /**
    * Creates a new DiaryController.
    *
-   * @param diaryEntryService the diary entry service
-   * @param authorService     the author service for author selection
-   * @param entriesView       the diary entries menu view
-   * @param listEntryView     the diary entries list view
-   * @param entryView         the single diary entry view
-   * @param createEntryView   the create entry view
+   * @param diaryEntryService  the diary entry service
+   * @param authorService      the author service for author selection
+   * @param entriesView        the diary entries menu view
+   * @param listEntryView      the diary entries list view
+   * @param entryView          the single diary entry view
+   * @param createEntryView    the create entry view
+   * @param searchEntriesView  the search entries view
    */
   public DiaryController(DiaryEntryService diaryEntryService,
       AuthorService authorService,
       DiaryEntriesView entriesView,
       ListDiaryEntryView listEntryView,
       DiaryEntryView entryView,
-      CreateDiaryEntryView createEntryView) {
+      CreateDiaryEntryView createEntryView,
+      SearchEntriesView searchEntriesView) {
     this.diaryEntryService = diaryEntryService;
     this.authorService = authorService;
     this.entriesView = entriesView;
     this.listEntryView = listEntryView;
     this.entryView = entryView;
     this.createEntryView = createEntryView;
+    this.searchEntriesView = searchEntriesView;
   }
 
   /**
@@ -218,8 +223,60 @@ public class DiaryController {
    * @return the next action to execute
    */
   public Action searchEntries(Scanner in, PrintStream out) {
-    // TODO: Implement entry search
-    return showEntriesMenu(in, out);
+    searchEntriesView.renderMenu(out);
+
+    while (true) {
+      String choice = in.nextLine().trim().toLowerCase();
+
+      switch (choice) {
+        case "1" -> {
+          return (in2, out2) -> searchByKeyword(in2, out2);
+        }
+        case "2" -> {
+          return (in2, out2) -> searchByDate(in2, out2);
+        }
+        case "3" -> {
+          return (in2, out2) -> searchByDateRange(in2, out2);
+        }
+        case "b" -> {
+          return this::showEntriesMenu;
+        }
+        default -> {
+          searchEntriesView.showError("Invalid selection. Try again.", out);
+          searchEntriesView.prompt(out);
+        }
+      }
+    }
+  }
+
+  /**
+   * Search entries by keyword.
+   */
+  private Action searchByKeyword(Scanner in, PrintStream out) {
+    searchEntriesView.showNotImplemented("Search by keyword", out);
+    searchEntriesView.promptContinue(out);
+    in.nextLine();
+    return this::searchEntries;
+  }
+
+  /**
+   * Search entries by date.
+   */
+  private Action searchByDate(Scanner in, PrintStream out) {
+    searchEntriesView.showNotImplemented("Search by date", out);
+    searchEntriesView.promptContinue(out);
+    in.nextLine();
+    return this::searchEntries;
+  }
+
+  /**
+   * Search entries by date range.
+   */
+  private Action searchByDateRange(Scanner in, PrintStream out) {
+    searchEntriesView.showNotImplemented("Search by date range", out);
+    searchEntriesView.promptContinue(out);
+    in.nextLine();
+    return this::searchEntries;
   }
 
   /**
