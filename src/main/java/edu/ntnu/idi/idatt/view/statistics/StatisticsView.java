@@ -26,21 +26,21 @@ public class StatisticsView implements BaseView {
         ConsoleFormatter.title("Statistics", out);
 
         // Overview section
-        out.println("  Authors:  " + ConsoleFormatter.coloredText(String.valueOf(totalAuthors), AnsiColors.CYAN));
-        out.println("  Entries:  " + ConsoleFormatter.coloredText(String.valueOf(totalEntries), AnsiColors.CYAN));
+        out.println("Authors:  " + ConsoleFormatter.coloredText(String.valueOf(totalAuthors), AnsiColors.CYAN));
+        out.println("Entries:  " + ConsoleFormatter.coloredText(String.valueOf(totalEntries), AnsiColors.CYAN));
 
         // Average
         if (totalAuthors > 0) {
             double avg = (double) totalEntries / totalAuthors;
-            out.println("  Average:  " + ConsoleFormatter.coloredText(String.format("%.1f", avg), AnsiColors.CYAN) 
-                    + " entries/author");
+            out.println("Average:  " + ConsoleFormatter.coloredText(String.format("%.1f", avg), AnsiColors.CYAN) 
+                    + "entries/author");
         }
 
         // Entries per author breakdown
         if (!entriesPerAuthor.isEmpty()) {
             out.println();
             out.println("-".repeat(30));
-            out.println("  Entries by Author");
+            out.println("Entries by Author");
             out.println("-".repeat(30));
 
             // Find longest name for alignment
@@ -52,7 +52,7 @@ public class StatisticsView implements BaseView {
                 String name = entry.getKey().getFullName();
                 long count = entry.getValue();
                 String padding = " ".repeat(maxLen - name.length());
-                out.println("  " + name + padding + "  " 
+                out.println(name + padding + "  " 
                         + ConsoleFormatter.coloredText(String.valueOf(count), AnsiColors.CYAN));
             }
         }
