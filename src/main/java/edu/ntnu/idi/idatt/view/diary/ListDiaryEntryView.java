@@ -41,7 +41,6 @@ public class ListDiaryEntryView implements BaseView {
             }
         }
 
-        out.println();
         ConsoleFormatter.dangerItem("b", "Back", out);
         ConsoleFormatter.prompt(out);
     }
