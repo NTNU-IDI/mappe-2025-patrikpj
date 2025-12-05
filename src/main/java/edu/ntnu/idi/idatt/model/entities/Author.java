@@ -212,12 +212,21 @@ public class Author {
   }
 
   /**
-   * Returns a string representation of this author.
+   * Returns a string representation of this author for debugging/logging.
    *
-   * @return the author's full name followed by email in parentheses
+   * @return string with class name and key fields
    */
   @Override
   public String toString() {
+    return "Author{id=" + id + ", name='" + getFullName() + "', email='" + email + "'}";
+  }
+
+  /**
+   * Returns a formatted string suitable for display.
+   *
+   * @return the author's full name with email in parentheses
+   */
+  public String toDisplayString() {
     return getFullName() + " (" + email + ")";
   }
 

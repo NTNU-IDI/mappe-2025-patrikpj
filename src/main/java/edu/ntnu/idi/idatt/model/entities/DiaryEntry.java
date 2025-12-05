@@ -174,13 +174,36 @@ public class DiaryEntry {
   }
 
   /**
-   * Returns a string with the entry title and author name.
+   * Returns a string representation of this entry for debugging/logging.
    *
-   * @return a short summary of the entry
+   * @return string with class name and key fields
    */
   @Override
   public String toString() {
+    return "DiaryEntry{id=" + id + ", title='" + title + "', authorId=" 
+        + (author != null ? author.getId() : null) + "}";
+  }
+
+  /**
+   * Returns a formatted string suitable for display.
+   *
+   * @return the entry title with author name
+   */
+  public String toDisplayString() {
     return title + " by " + author.getFullName();
+  }
+
+  /**
+   * Returns a short summary of the content.
+   *
+   * @param maxLength the maximum length of the summary
+   * @return truncated content with ellipsis if needed
+   */
+  public String getContentPreview(int maxLength) {
+    if (content.length() <= maxLength) {
+      return content;
+    }
+    return content.substring(0, maxLength - 3) + "...";
   }
 
   /**

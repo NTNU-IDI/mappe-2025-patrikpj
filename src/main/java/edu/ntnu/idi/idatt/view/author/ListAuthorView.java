@@ -26,7 +26,7 @@ public class ListAuthorView implements BaseView {
         } else {
             int index = 1;
             for (Author author : authors) {
-                ConsoleFormatter.menuItem(String.valueOf(index++), author.getFullName() + " (" + author.getEmail() + ")", out);
+                ConsoleFormatter.menuItem(String.valueOf(index++), author.toDisplayString(), out);
             }
         }
         
