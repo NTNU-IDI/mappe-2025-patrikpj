@@ -109,6 +109,15 @@ public class Author {
   }
 
   /**
+   * Sets the author ID. Package-private for testing purposes only.
+   *
+   * @param id the ID to set
+   */
+  void setId(Long id) {
+    this.id = id;
+  }
+
+  /**
    * Returns the first name of this author.
    *
    * @return the first name
