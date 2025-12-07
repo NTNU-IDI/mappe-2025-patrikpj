@@ -107,6 +107,18 @@ public class DiaryEntryService {
   }
 
   /**
+   * Finds all diary entries created within a date range (inclusive).
+   *
+   * @param startDate the start date (inclusive)
+   * @param endDate   the end date (inclusive)
+   * @return a list of entries within the date range
+   * @throws NullPointerException if either date is null
+   */
+  public List<DiaryEntry> findByDateRange(java.time.LocalDate startDate, java.time.LocalDate endDate) {
+    return entryRepository.findByDateRange(startDate, endDate);
+  }
+
+  /**
    * Updates a diary entry's title.
    *
    * @param entry    the entry to update

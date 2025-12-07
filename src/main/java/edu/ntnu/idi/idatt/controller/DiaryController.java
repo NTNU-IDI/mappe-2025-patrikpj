@@ -405,12 +405,110 @@ public class DiaryController {
 
   /**
    * Search entries by date range.
+   *
+   * @param in  Scanner for user input
+   * @param out PrintStream for output
+   * @return the next action to execute
    */
   private Action searchByDateRange(Scanner in, PrintStream out) {
-    searchEntriesView.showNotImplemented("Search by date range", out);
-    searchEntriesView.promptContinue(out);
-    in.nextLine();
-    return this::searchEntries;
+    searchEntriesView.renderDateRangeSearch(out);
+
+    // Get start date
+    LocalDate startDate;
+    String startStr;
+    while (true) {
+      searchEntriesView.promptStartDate(out);
+      startStr = in.nextLine().trim();
+
+      if (startStr.isBlank()) {
+        return this::searchEntries;
+      }
+
+      try {
+        startDate = LocalDate.parse(startStr, DATE_INPUT_FORMAT);
+        break;
+      } catch (DateTimeParseException e) {
+        searchEntriesView.showInvalidDateFormat(out);
+      }
+    }
+
+    // Get end date
+    LocalDate endDate;
+    String endStr;
+    while (true) {
+      searchEntriesView.promptEndDate(out);
+      endStr = in.nextLine().trim();
+
+      if (endStr.isBlank()) {
+        return this::searchEntries;
+      }
+
+      try {
+        endDate = LocalDate.parse(endStr, DATE_INPUT_FORMAT);
+      } catch (DateTimeParseException e) {
+        searchEntriesView.showInvalidDateFormat(out);
+        continue;
+      }
+
+      if (endDate.isBefore(startDate)) {
+        searchEntriesView.showEndDateBeforeStart(out);
+        continue;
+      }
+
+      break;
+    }
+
+    List<DiaryEntry> results = diaryEntryService.findByDateRange(startDate, endDate);
+
+    if (results.isEmpty()) {
+      searchEntriesView.showNoResultsForDateRange(startStr, endStr, out);
+      searchEntriesView.promptContinue(out);
+      in.nextLine();
+      return this::searchEntries;
+    }
+
+    // Capture final values for lambda
+    final String finalStartStr = startStr;
+    final String finalEndStr = endStr;
+    return (in2, out2) -> showDateRangeResults(results, finalStartStr, finalEndStr, in2, out2);
+  }
+
+  /**
+   * Shows date range search results and handles selection.
+   *
+   * @param results  the search results
+   * @param startStr the start date string
+   * @param endStr   the end date string
+   * @param in       Scanner for user input
+   * @param out      PrintStream for output
+   * @return the next action to execute
+   */
+  private Action showDateRangeResults(List<DiaryEntry> results, String startStr, String endStr,
+      Scanner in, PrintStream out) {
+    listEntryView.renderDateRangeResults(results, startStr, endStr, out);
+
+    while (true) {
+      String choice = in.nextLine().trim().toLowerCase();
+
+      if (choice.equals("b")) {
+        return this::searchEntries;
+      }
+
+      // Try to parse as number for entry selection
+      try {
+        int index = Integer.parseInt(choice) - 1;
+        if (index >= 0 && index < results.size()) {
+          DiaryEntry selected = results.get(index);
+          return (in2, out2) -> showEntryDetail(selected,
+              (in3, out3) -> showDateRangeResults(results, startStr, endStr, in3, out3), in2, out2);
+        }
+      } catch (NumberFormatException ignored) {
+        // Fall through to error
+      }
+
+      listEntryView.showError("Invalid selection. Try again.", out);
+      listEntryView.prompt(out);
+    }
   }
 
   /**

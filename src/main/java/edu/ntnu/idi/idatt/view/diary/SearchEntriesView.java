@@ -114,5 +114,59 @@ public class SearchEntriesView implements BaseView {
     out.print(AnsiColors.RESET);
     showWarning("No entries found for: " + dateStr, out);
   }
+
+  /**
+   * Renders the date range search form.
+   *
+   * @param out the output stream
+   */
+  public void renderDateRangeSearch(PrintStream out) {
+    out.println(AnsiColors.CLEAR_SCREEN);
+    ConsoleFormatter.title("Search by Date Range", out);
+    out.println("Enter a date range to find entries.");
+    out.println("Format: DD-MM-YYYY (e.g. 01-12-2025)");
+    out.println("Leave empty to cancel.");
+    out.println();
+  }
+
+  /**
+   * Prompts for start date input.
+   *
+   * @param out the output stream
+   */
+  public void promptStartDate(PrintStream out) {
+    out.print(AnsiColors.RESET + "Start date: " + AnsiColors.CYAN);
+  }
+
+  /**
+   * Prompts for end date input.
+   *
+   * @param out the output stream
+   */
+  public void promptEndDate(PrintStream out) {
+    out.print(AnsiColors.RESET + "End date: " + AnsiColors.CYAN);
+  }
+
+  /**
+   * Shows message when end date is before start date.
+   *
+   * @param out the output stream
+   */
+  public void showEndDateBeforeStart(PrintStream out) {
+    out.print(AnsiColors.RESET);
+    showError("End date cannot be before start date.", out);
+  }
+
+  /**
+   * Shows message when no results found for a date range.
+   *
+   * @param startStr the start date string
+   * @param endStr   the end date string
+   * @param out      the output stream
+   */
+  public void showNoResultsForDateRange(String startStr, String endStr, PrintStream out) {
+    out.print(AnsiColors.RESET);
+    showWarning("No entries found between " + startStr + " and " + endStr, out);
+  }
 }
 

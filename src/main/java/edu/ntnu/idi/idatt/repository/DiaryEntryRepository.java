@@ -149,6 +149,30 @@ public class DiaryEntryRepository {
   }
 
   /**
+   * Finds all diary entries created within a date range (inclusive).
+   *
+   * @param startDate the start date (inclusive)
+   * @param endDate   the end date (inclusive)
+   * @return a list of entries within the date range (never null)
+   * @throws NullPointerException if either date is null
+   */
+  public List<DiaryEntry> findByDateRange(java.time.LocalDate startDate, java.time.LocalDate endDate) {
+    Objects.requireNonNull(startDate, "Start date cannot be null");
+    Objects.requireNonNull(endDate, "End date cannot be null");
+    try (Session session = sessionFactory.openSession()) {
+      java.time.LocalDateTime start = startDate.atStartOfDay();
+      java.time.LocalDateTime end = endDate.plusDays(1).atStartOfDay();
+      return session
+          .createQuery(
+              "FROM DiaryEntry WHERE createdAt >= :start AND createdAt < :end ORDER BY createdAt DESC",
+              DiaryEntry.class)
+          .setParameter("start", start)
+          .setParameter("end", end)
+          .list();
+    }
+  }
+
+  /**
    * Updates an existing diary entry in the database.
    *
    * @param entry the diary entry to update

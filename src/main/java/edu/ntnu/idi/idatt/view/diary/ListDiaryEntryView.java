@@ -98,5 +98,34 @@ public class ListDiaryEntryView implements BaseView {
     ConsoleFormatter.dangerItem("b", "Back", out);
     ConsoleFormatter.prompt(out);
   }
+
+  /**
+   * Renders search results for a date range.
+   *
+   * @param entries  the list of matching entries
+   * @param startStr the start date string
+   * @param endStr   the end date string
+   * @param out      the output stream
+   */
+  public void renderDateRangeResults(List<DiaryEntry> entries, String startStr, String endStr,
+      PrintStream out) {
+    out.println(AnsiColors.CLEAR_SCREEN);
+    ConsoleFormatter.title("Search Results", out);
+
+    out.println("Found " + entries.size() + " entries between " + startStr + " and " + endStr + ":");
+    out.println();
+
+    int index = 1;
+    for (DiaryEntry entry : entries) {
+      String timeStr = entry.getCreatedAt().format(DATE_FORMAT);
+      String summary = entry.getTitle() + " - "
+          + ConsoleFormatter.coloredText(entry.getAuthor().getFullName(), AnsiColors.CYAN)
+          + " (" + timeStr + ")";
+      ConsoleFormatter.menuItem(String.valueOf(index++), summary, out);
+    }
+
+    ConsoleFormatter.dangerItem("b", "Back", out);
+    ConsoleFormatter.prompt(out);
+  }
 }
 
