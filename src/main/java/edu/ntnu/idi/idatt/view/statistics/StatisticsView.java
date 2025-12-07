@@ -36,7 +36,7 @@ public class StatisticsView implements BaseView {
       double avg = (double) totalEntries / totalAuthors;
       out.println(
           "Average:  " + ConsoleFormatter.coloredText(String.format("%.1f", avg), AnsiColors.CYAN)
-              + "entries/author");
+              + " entries/author");
     }
 
     // Entries per author breakdown
