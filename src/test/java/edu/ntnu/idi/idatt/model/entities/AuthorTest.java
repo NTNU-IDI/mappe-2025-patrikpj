@@ -2,7 +2,6 @@ package edu.ntnu.idi.idatt.model.entities;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -125,7 +124,7 @@ class AuthorTest {
     }
   }
 
-  // setters test
+  // setters tests
   @Nested
   @DisplayName("Setters")
   class SetterTests {
@@ -158,105 +157,105 @@ class AuthorTest {
       assertEquals("new.email@example.com", author.getEmail());
     }
   }
-}
 
-// other methods
-@Nested
-@DisplayName("Other Methods")
-class OtherMethodsTests {
-  
-  private Author author;
-  
-  @BeforeEach
-  void setUp() {
-    author = new Author("John", "Doe", "john@example.com");
-  }
-  
-  @Test
-  @DisplayName("getFullName should return firstName + lastName")
-  void getFullNameShouldCombineNames() {
-    assertEquals("John Doe", author.getFullName());
-  }
-  
-  @Test
-  @DisplayName("toDisplayString should return formatted string")
-  void toDisplayStringShouldReturnFormattedString() {
-    assertEquals("John Doe (john@example.com)", author.toDisplayString());
-  }
-  
-  @Test
-  @DisplayName("toString should contain relevant info")
-  void toStringShouldContainRelevantInfo() {
-    String result = author.toString();
-    
-    assertTrue(result.contains("Author"));
-    assertTrue(result.contains("John Doe"));
-    assertTrue(result.contains("john@example.com"));
+  // other methods
+  @Nested
+  @DisplayName("Other Methods")
+  class OtherMethodsTests {
+
+    private Author author;
+
+    @BeforeEach
+    void setUp() {
+      author = new Author("John", "Doe", "john@example.com");
+    }
+
+    @Test
+    @DisplayName("getFullName should return firstName + lastName")
+    void getFullNameShouldCombineNames() {
+      assertEquals("John Doe", author.getFullName());
+    }
+
+    @Test
+    @DisplayName("toDisplayString should return formatted string")
+    void toDisplayStringShouldReturnFormattedString() {
+      assertEquals("John Doe (john@example.com)", author.toDisplayString());
+    }
+
+    @Test
+    @DisplayName("toString should contain relevant info")
+    void toStringShouldContainRelevantInfo() {
+      String result = author.toString();
+
+      assertTrue(result.contains("Author"));
+      assertTrue(result.contains("John Doe"));
+      assertTrue(result.contains("john@example.com"));
+    }
   }
 
   // equals and hashCode tests
   @Nested
   @DisplayName("equals() and hashCode()")
   class EqualsHashCodeTests {
-    
+
     @Test
     @DisplayName("equals should return true for same email")
     void equalsShouldReturnTrueForSameEmail() {
       Author author1 = new Author("John", "Doe", "same@example.com");
       Author author2 = new Author("Jane", "Smith", "same@example.com");
-      
+
       assertEquals(author1, author2);
     }
-    
+
     @Test
     @DisplayName("equals should return false for different email")
     void equalsShouldReturnFalseForDifferentEmail() {
       Author author1 = new Author("John", "Doe", "john@example.com");
       Author author2 = new Author("John", "Doe", "jane@example.com");
-      
+
       assertNotEquals(author1, author2);
     }
-    
+
     @Test
     @DisplayName("equals should return true for same object")
     void equalsShouldReturnTrueForSameObject() {
       Author author = new Author("John", "Doe", "john@example.com");
-      
+
       assertEquals(author, author);
     }
-    
+
     @Test
     @DisplayName("equals should return false for null")
     void equalsShouldReturnFalseForNull() {
       Author author = new Author("John", "Doe", "john@example.com");
-      
+
       assertNotEquals(null, author);
     }
-    
+
     @Test
     @DisplayName("equals should return false for different type")
     void equalsShouldReturnFalseForDifferentType() {
       Author author = new Author("John", "Doe", "john@example.com");
-      
+
       assertNotEquals("john@example.com", author);
     }
-    
+
     @Test
     @DisplayName("hashCode should be equal for equal objects")
     void hashCodeShouldBeEqualForEqualObjects() {
       Author author1 = new Author("John", "Doe", "same@example.com");
       Author author2 = new Author("Jane", "Smith", "same@example.com");
-      
+
       assertEquals(author1.hashCode(), author2.hashCode());
     }
-    
+
     @Test
     @DisplayName("hashCode should be consistent")
     void hashCodeShouldBeConsistent() {
       Author author = new Author("John", "Doe", "john@example.com");
       int hashCode1 = author.hashCode();
       int hashCode2 = author.hashCode();
-      
+
       assertEquals(hashCode1, hashCode2);
     }
   }
