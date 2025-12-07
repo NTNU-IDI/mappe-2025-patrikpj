@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory>
+        <!-- In-memory SQLite for tests -->
+        <property name="hibernate.connection.driver_class">org.sqlite.JDBC</property>
+        <property name="hibernate.connection.url">jdbc:sqlite::memory:</property>
+        <property name="hibernate.dialect">org.hibernate.community.dialect.SQLiteDialect</property>
+        
+        <!-- Silent for tests -->
+        <property name="hibernate.show_sql">false</property>
+        
+        <!-- Recreate schema for each test run -->
+        <property name="hibernate.hbm2ddl.auto">create-drop</property>
+
+        <!-- Entity mappings -->
+        <mapping class="edu.ntnu.idi.idatt.model.entities.Author"/>
+        <mapping class="edu.ntnu.idi.idatt.model.entities.DiaryEntry"/>
+    </session-factory>
+</hibernate-configuration>
+
