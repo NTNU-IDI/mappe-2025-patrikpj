@@ -20,6 +20,7 @@ import edu.ntnu.idi.idatt.view.author.ListAuthorView;
 import edu.ntnu.idi.idatt.view.diary.CreateDiaryEntryView;
 import edu.ntnu.idi.idatt.view.diary.DiaryEntriesView;
 import edu.ntnu.idi.idatt.view.diary.DiaryEntryView;
+import edu.ntnu.idi.idatt.view.diary.EditDiaryEntryView;
 import edu.ntnu.idi.idatt.view.diary.ListDiaryEntryView;
 import edu.ntnu.idi.idatt.view.diary.SearchEntriesView;
 import edu.ntnu.idi.idatt.view.mainmenu.MainMenuView;
@@ -63,6 +64,7 @@ public class DiaryApp {
   private DiaryEntryView diaryEntryView;
   private CreateDiaryEntryView createDiaryEntryView;
   private SearchEntriesView searchEntriesView;
+  private EditDiaryEntryView editDiaryEntryView;
   private StatisticsView statisticsView;
 
   // Controllers
@@ -103,6 +105,7 @@ public class DiaryApp {
     this.diaryEntryView = new DiaryEntryView();
     this.createDiaryEntryView = new CreateDiaryEntryView();
     this.searchEntriesView = new SearchEntriesView();
+    this.editDiaryEntryView = new EditDiaryEntryView();
     this.statisticsView = new StatisticsView();
 
     // Controllers
@@ -112,7 +115,7 @@ public class DiaryApp {
         listAuthorView, authorView, createAuthorView, findAuthorView, editAuthorView);
     this.diaryController = new DiaryController(diaryEntryService, authorService,
         diaryEntriesView, listDiaryEntryView, diaryEntryView, createDiaryEntryView,
-        searchEntriesView);
+        searchEntriesView, editDiaryEntryView);
 
     // Wire navigation references (setter injection to break circular dependencies)
     mainMenuController.setAuthorController(authorController);

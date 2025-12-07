@@ -7,6 +7,7 @@ import edu.ntnu.idi.idatt.service.DiaryEntryService;
 import edu.ntnu.idi.idatt.view.diary.CreateDiaryEntryView;
 import edu.ntnu.idi.idatt.view.diary.DiaryEntriesView;
 import edu.ntnu.idi.idatt.view.diary.DiaryEntryView;
+import edu.ntnu.idi.idatt.view.diary.EditDiaryEntryView;
 import edu.ntnu.idi.idatt.view.diary.ListDiaryEntryView;
 import edu.ntnu.idi.idatt.view.diary.SearchEntriesView;
 import java.io.PrintStream;
@@ -28,6 +29,7 @@ public class DiaryController {
   private final DiaryEntryView entryView;
   private final CreateDiaryEntryView createEntryView;
   private final SearchEntriesView searchEntriesView;
+  private final EditDiaryEntryView editEntryView;
 
   // Navigation reference
   private MainMenuController mainMenuController;
@@ -42,6 +44,7 @@ public class DiaryController {
    * @param entryView          the single diary entry view
    * @param createEntryView    the create entry view
    * @param searchEntriesView  the search entries view
+   * @param editEntryView      the edit entry view
    */
   public DiaryController(DiaryEntryService diaryEntryService,
       AuthorService authorService,
@@ -49,7 +52,8 @@ public class DiaryController {
       ListDiaryEntryView listEntryView,
       DiaryEntryView entryView,
       CreateDiaryEntryView createEntryView,
-      SearchEntriesView searchEntriesView) {
+      SearchEntriesView searchEntriesView,
+      EditDiaryEntryView editEntryView) {
     this.diaryEntryService = diaryEntryService;
     this.authorService = authorService;
     this.entriesView = entriesView;
@@ -57,6 +61,7 @@ public class DiaryController {
     this.entryView = entryView;
     this.createEntryView = createEntryView;
     this.searchEntriesView = searchEntriesView;
+    this.editEntryView = editEntryView;
   }
 
   /**
@@ -546,7 +551,7 @@ public class DiaryController {
   }
 
   /**
-   * Edits a diary entry.
+   * Edits a diary entry's title and/or content.
    *
    * @param entry           the entry to edit
    * @param backDestination the action to return to
@@ -555,9 +560,68 @@ public class DiaryController {
    * @return the next action to execute
    */
   private Action editEntry(DiaryEntry entry, Action backDestination, Scanner in, PrintStream out) {
-    // TODO: Implement entry editing
-    entryView.showWarning("Edit entry - not implemented yet", out);
-    entryView.promptContinue(out);
+    editEntryView.render(entry, out);
+
+    // Collect new values
+    String newTitle = null;
+    String newContent = null;
+
+    // Title
+    editEntryView.promptTitle(entry.getTitle(), out);
+    String titleInput = in.nextLine().trim();
+    if (!titleInput.isEmpty()) {
+      if (titleInput.isBlank()) {
+        editEntryView.showError("Title cannot be blank.", out);
+      } else {
+        newTitle = titleInput;
+      }
+    }
+
+    // Content
+    editEntryView.promptReplaceContent(out);
+    String replaceChoice = in.nextLine().trim().toLowerCase();
+    if (replaceChoice.equals("y") || replaceChoice.equals("yes")) {
+      editEntryView.showContentInstructions(out);
+
+      StringBuilder contentBuilder = new StringBuilder();
+      String previousLine = null;
+      while (true) {
+        String line = in.nextLine();
+        if (line.isEmpty() && (previousLine != null && previousLine.isEmpty())) {
+          break;
+        }
+        if (contentBuilder.length() > 0) {
+          contentBuilder.append("\n");
+        }
+        contentBuilder.append(line);
+        previousLine = line;
+      }
+
+      String contentInput = contentBuilder.toString().trim();
+      if (!contentInput.isEmpty()) {
+        if (contentInput.isBlank()) {
+          editEntryView.showError("Content cannot be blank.", out);
+        } else {
+          newContent = contentInput;
+        }
+      }
+    }
+
+    // Apply changes if any
+    if (newTitle == null && newContent == null) {
+      editEntryView.showNoChanges(out);
+    } else {
+      if (newTitle != null) {
+        entry.setTitle(newTitle);
+      }
+      if (newContent != null) {
+        entry.setContent(newContent);
+      }
+      diaryEntryService.update(entry);
+      editEntryView.showUpdated(entry.getTitle(), out);
+    }
+
+    editEntryView.promptContinue(out);
     in.nextLine();
     return (in2, out2) -> showEntryDetail(entry, backDestination, in2, out2);
   }
