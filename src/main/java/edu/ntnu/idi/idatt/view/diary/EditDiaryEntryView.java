@@ -53,7 +53,7 @@ public class EditDiaryEntryView implements BaseView {
    */
   public void showContentInstructions(PrintStream out) {
     out.println(AnsiColors.RESET);
-    out.println("Enter new content (press Enter twice to finish):");
+    out.println("Enter new content (leave two empty lines to finish):");
     out.print(AnsiColors.CYAN);
   }
 
