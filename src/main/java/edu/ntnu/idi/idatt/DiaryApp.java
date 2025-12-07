@@ -1,10 +1,10 @@
 package edu.ntnu.idi.idatt;
 
 import edu.ntnu.idi.idatt.controller.Action;
-import edu.ntnu.idi.idatt.controller.Router;
 import edu.ntnu.idi.idatt.controller.AuthorController;
 import edu.ntnu.idi.idatt.controller.DiaryController;
 import edu.ntnu.idi.idatt.controller.MainMenuController;
+import edu.ntnu.idi.idatt.controller.Router;
 import edu.ntnu.idi.idatt.repository.AuthorRepository;
 import edu.ntnu.idi.idatt.repository.DiaryEntryRepository;
 import edu.ntnu.idi.idatt.service.AuthorService;
@@ -31,8 +31,8 @@ import org.hibernate.SessionFactory;
 
 /**
  * Composition root for the Diary application.
- * <p>
- * Responsibilities: - Initialize infrastructure (Hibernate, Scanner) - Create repositories,
+ *
+ * <p>Responsibilities: - Initialize infrastructure (Hibernate, Scanner) - Create repositories,
  * services, views, and controllers - Wire all dependencies together - Build the initial Action and
  * start the Router loop - Register shutdown hooks for cleanup
  */
@@ -130,8 +130,8 @@ public class DiaryApp {
   }
 
   /**
-   * Starts the application: - Creates the initial action (main menu) - Hands control to the Router
-   * (action loop)
+   * Starts the application. Creates the initial action (main menu) and hands control to the Router
+   * (action loop).
    */
   public void start() {
     // Initial action: show main menu

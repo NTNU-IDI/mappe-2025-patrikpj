@@ -562,11 +562,8 @@ public class DiaryController {
   private Action editEntry(DiaryEntry entry, Action backDestination, Scanner in, PrintStream out) {
     editEntryView.render(entry, out);
 
-    // Collect new values
-    String newTitle = null;
-    String newContent = null;
-
     // Title
+    String newTitle = null;
     editEntryView.promptTitle(entry.getTitle(), out);
     String titleInput = in.nextLine().trim();
     if (!titleInput.isEmpty()) {
@@ -578,6 +575,7 @@ public class DiaryController {
     }
 
     // Content
+    String newContent = null;
     editEntryView.promptReplaceContent(out);
     String replaceChoice = in.nextLine().trim().toLowerCase();
     if (replaceChoice.equals("y") || replaceChoice.equals("yes")) {

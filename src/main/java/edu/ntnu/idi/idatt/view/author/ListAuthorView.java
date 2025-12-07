@@ -1,12 +1,15 @@
 package edu.ntnu.idi.idatt.view.author;
 
 import edu.ntnu.idi.idatt.model.entities.Author;
+import edu.ntnu.idi.idatt.view._components.AnsiColors;
 import edu.ntnu.idi.idatt.view._components.BaseView;
 import edu.ntnu.idi.idatt.view._components.ConsoleFormatter;
-import edu.ntnu.idi.idatt.view._components.AnsiColors;
 import java.io.PrintStream;
 import java.util.List;
 
+/**
+ * View for displaying a list of authors.
+ */
 public class ListAuthorView implements BaseView {
 
   /**

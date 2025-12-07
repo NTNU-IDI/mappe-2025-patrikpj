@@ -4,11 +4,20 @@ import edu.ntnu.idi.idatt.model.entities.Author;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * Service for computing statistics about diary entries and authors.
+ */
 public class StatisticsService {
 
   private final AuthorService authorService;
   private final DiaryEntryService diaryEntryService;
 
+  /**
+   * Creates a new StatisticsService.
+   *
+   * @param authorService      the author service
+   * @param diaryEntryService  the diary entry service
+   */
   public StatisticsService(AuthorService authorService, DiaryEntryService diaryEntryService) {
     this.authorService = authorService;
     this.diaryEntryService = diaryEntryService;

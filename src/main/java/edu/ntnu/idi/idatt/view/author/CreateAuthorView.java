@@ -5,6 +5,9 @@ import edu.ntnu.idi.idatt.view._components.BaseView;
 import edu.ntnu.idi.idatt.view._components.ConsoleFormatter;
 import java.io.PrintStream;
 
+/**
+ * View for the create author form.
+ */
 public class CreateAuthorView implements BaseView {
 
   /**
@@ -19,14 +22,29 @@ public class CreateAuthorView implements BaseView {
     out.println();
   }
 
+  /**
+   * Prompts for the author's first name.
+   *
+   * @param out the output stream
+   */
   public void promptFirstName(PrintStream out) {
     out.print(AnsiColors.RESET + "First Name: " + AnsiColors.CYAN);
   }
 
+  /**
+   * Prompts for the author's last name.
+   *
+   * @param out the output stream
+   */
   public void promptLastName(PrintStream out) {
     out.print(AnsiColors.RESET + "Last Name: " + AnsiColors.CYAN);
   }
 
+  /**
+   * Prompts for the author's email.
+   *
+   * @param out the output stream
+   */
   public void promptEmail(PrintStream out) {
     out.print(AnsiColors.RESET + "Email: " + AnsiColors.CYAN);
   }

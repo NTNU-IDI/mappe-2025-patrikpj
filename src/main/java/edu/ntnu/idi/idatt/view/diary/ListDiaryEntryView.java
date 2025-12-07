@@ -112,7 +112,8 @@ public class ListDiaryEntryView implements BaseView {
     out.println(AnsiColors.CLEAR_SCREEN);
     ConsoleFormatter.title("Search Results", out);
 
-    out.println("Found " + entries.size() + " entries between " + startStr + " and " + endStr + ":");
+    out.println(
+        "Found " + entries.size() + " entries between " + startStr + " and " + endStr + ":");
     out.println();
 
     int index = 1;

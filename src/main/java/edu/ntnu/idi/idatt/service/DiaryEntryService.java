@@ -114,7 +114,8 @@ public class DiaryEntryService {
    * @return a list of entries within the date range
    * @throws NullPointerException if either date is null
    */
-  public List<DiaryEntry> findByDateRange(java.time.LocalDate startDate, java.time.LocalDate endDate) {
+  public List<DiaryEntry> findByDateRange(java.time.LocalDate startDate,
+      java.time.LocalDate endDate) {
     return entryRepository.findByDateRange(startDate, endDate);
   }
 

@@ -6,6 +6,9 @@ import edu.ntnu.idi.idatt.view._components.BaseView;
 import edu.ntnu.idi.idatt.view._components.ConsoleFormatter;
 import java.io.PrintStream;
 
+/**
+ * View for displaying author details.
+ */
 public class AuthorView implements BaseView {
 
   /**

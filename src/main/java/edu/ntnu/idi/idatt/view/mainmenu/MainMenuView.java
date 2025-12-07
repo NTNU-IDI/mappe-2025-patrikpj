@@ -6,8 +6,16 @@ import edu.ntnu.idi.idatt.view._components.ConsoleFormatter;
 import edu.ntnu.idi.idatt.view._components.DiarySystemBanner;
 import java.io.PrintStream;
 
+/**
+ * View for the main menu screen.
+ */
 public class MainMenuView implements BaseView {
 
+  /**
+   * Renders the main menu with available options.
+   *
+   * @param out the output stream
+   */
   public void renderMenu(PrintStream out) {
     out.println(AnsiColors.CLEAR_SCREEN);
     out.println(DiarySystemBanner.getColoredBanner());

@@ -327,11 +327,8 @@ public class AuthorController {
   private Action editAuthor(Author author, Action backDestination, Scanner in, PrintStream out) {
     editAuthorView.render(author, out);
 
-    // Collect new values
-    String newFirstName = null;
-    String newLastName = null;
-
     // First name
+    String newFirstName = null;
     editAuthorView.promptFirstName(author.getFirstName(), out);
     String firstNameInput = in.nextLine().trim();
     if (!firstNameInput.isEmpty()) {
@@ -343,6 +340,7 @@ public class AuthorController {
     }
 
     // Last name
+    String newLastName = null;
     editAuthorView.promptLastName(author.getLastName(), out);
     String lastNameInput = in.nextLine().trim();
     if (!lastNameInput.isEmpty()) {
