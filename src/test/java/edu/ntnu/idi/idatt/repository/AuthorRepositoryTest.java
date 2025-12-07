@@ -3,6 +3,7 @@ package edu.ntnu.idi.idatt.repository;
 import static org.junit.jupiter.api.Assertions.*;
 
 import edu.ntnu.idi.idatt.model.entities.Author;
+import edu.ntnu.idi.idatt.model.entities.DiaryEntry;
 import edu.ntnu.idi.idatt.util.TestHibernateUtil;
 import java.util.List;
 import java.util.Optional;
@@ -153,6 +154,12 @@ class AuthorRepositoryTest {
 
       assertTrue(found.isEmpty());
     }
+
+    @Test
+    @DisplayName("should throw NullPointerException for null email")
+    void shouldThrowForNullEmail() {
+      assertThrows(NullPointerException.class, () -> repository.findByEmail(null));
+    }
   }
 
   // findAll tests
@@ -197,6 +204,12 @@ class AuthorRepositoryTest {
       assertTrue(found.isPresent());
       assertEquals("Jonathan", found.get().getFirstName());
     }
+
+    @Test
+    @DisplayName("should throw NullPointerException for null author")
+    void shouldThrowForNullAuthor() {
+      assertThrows(NullPointerException.class, () -> repository.update(null));
+    }
   }
 
   // delete tests
@@ -213,6 +226,32 @@ class AuthorRepositoryTest {
       repository.delete(author);
 
       assertTrue(repository.findById(id).isEmpty());
+    }
+
+    @Test
+    @DisplayName("should throw NullPointerException for null author")
+    void shouldThrowForNullAuthor() {
+      assertThrows(NullPointerException.class, () -> repository.delete(null));
+    }
+
+    @Test
+    @DisplayName("should cascade delete diary entries when author is deleted")
+    void shouldCascadeDeleteDiaryEntries() {
+      // Create author and diary entries
+      Author author = repository.save(new Author("John", "Doe", "john@example.com"));
+      DiaryEntryRepository entryRepository = new DiaryEntryRepository(sessionFactory);
+      
+      DiaryEntry entry1 = entryRepository.save(new DiaryEntry("Entry 1", author, "Content 1"));
+      DiaryEntry entry2 = entryRepository.save(new DiaryEntry("Entry 2", author, "Content 2"));
+      Long entry1Id = entry1.getId();
+      Long entry2Id = entry2.getId();
+
+      // Delete the author
+      repository.delete(author);
+
+      // Verify diary entries are also deleted (cascade)
+      assertTrue(entryRepository.findById(entry1Id).isEmpty());
+      assertTrue(entryRepository.findById(entry2Id).isEmpty());
     }
   }
 
@@ -241,6 +280,12 @@ class AuthorRepositoryTest {
       repository.save(new Author("John", "Doe", "john@example.com"));
 
       assertTrue(repository.existsByEmail("JOHN@EXAMPLE.COM"));
+    }
+
+    @Test
+    @DisplayName("should throw NullPointerException for null email")
+    void shouldThrowForNullEmail() {
+      assertThrows(NullPointerException.class, () -> repository.existsByEmail(null));
     }
   }
 }
