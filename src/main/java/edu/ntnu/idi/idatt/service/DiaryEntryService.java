@@ -202,4 +202,13 @@ public class DiaryEntryService {
   public long countByAuthorId(Long authorId) {
     return entryRepository.countByAuthorId(authorId);
   }
+
+  /**
+   * Gets the count of diary entries grouped by author in a single query.
+   *
+   * @return a map of author ID to entry count
+   */
+  public java.util.Map<Long, Long> countEntriesGroupedByAuthor() {
+    return entryRepository.countEntriesGroupedByAuthor();
+  }
 }

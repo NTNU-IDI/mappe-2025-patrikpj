@@ -232,6 +232,27 @@ public class DiaryEntryRepository {
   }
 
   /**
+   * Counts diary entries grouped by author in a single query.
+   *
+   * @return a map of author ID to entry count
+   */
+  public java.util.Map<Long, Long> countEntriesGroupedByAuthor() {
+    try (Session session = sessionFactory.openSession()) {
+      List<Object[]> results = session
+          .createQuery("SELECT e.author.id, COUNT(e) FROM DiaryEntry e GROUP BY e.author.id",
+              Object[].class)
+          .list();
+      java.util.Map<Long, Long> countsByAuthorId = new java.util.HashMap<>();
+      for (Object[] row : results) {
+        Long authorId = (Long) row[0];
+        Long count = (Long) row[1];
+        countsByAuthorId.put(authorId, count);
+      }
+      return countsByAuthorId;
+    }
+  }
+
+  /**
    * Executes an operation within a transaction, handling commit and rollback.
    *
    * @param operation the operation to execute

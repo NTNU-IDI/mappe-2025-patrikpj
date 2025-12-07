@@ -24,13 +24,18 @@ public class StatisticsService {
 
   /**
    * Returns a map of authors to their entry count.
+   * Uses a single query to avoid N+1 performance problem.
    *
    * @return map with author as key and entry count as value
    */
   public Map<Author, Long> getEntriesPerAuthor() {
+    // Single query to get all counts grouped by author
+    Map<Long, Long> countsByAuthorId = diaryEntryService.countEntriesGroupedByAuthor();
+    
+    // Build result map with Author objects
     Map<Author, Long> entriesPerAuthor = new LinkedHashMap<>();
     for (Author author : authorService.findAll()) {
-      long count = diaryEntryService.countByAuthorId(author.getId());
+      long count = countsByAuthorId.getOrDefault(author.getId(), 0L);
       entriesPerAuthor.put(author, count);
     }
     return entriesPerAuthor;
