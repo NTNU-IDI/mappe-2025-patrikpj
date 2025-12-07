@@ -1,13 +1,16 @@
 package edu.ntnu.idi.idatt.controller;
 
 import edu.ntnu.idi.idatt.model.entities.Author;
+import edu.ntnu.idi.idatt.model.entities.DiaryEntry;
 import edu.ntnu.idi.idatt.service.AuthorService;
+import edu.ntnu.idi.idatt.service.DiaryEntryService;
 import edu.ntnu.idi.idatt.view.author.AuthorMenuView;
 import edu.ntnu.idi.idatt.view.author.AuthorView;
 import edu.ntnu.idi.idatt.view.author.CreateAuthorView;
 import edu.ntnu.idi.idatt.view.author.EditAuthorView;
 import edu.ntnu.idi.idatt.view.author.FindAuthorView;
 import edu.ntnu.idi.idatt.view.author.ListAuthorView;
+import edu.ntnu.idi.idatt.view.diary.ListDiaryEntryView;
 import java.io.PrintStream;
 import java.util.List;
 import java.util.Optional;
@@ -19,38 +22,45 @@ import java.util.Scanner;
 public class AuthorController {
 
   private final AuthorService authorService;
+  private final DiaryEntryService diaryEntryService;
   private final AuthorMenuView view;
   private final ListAuthorView listAuthorView;
   private final AuthorView authorView;
   private final CreateAuthorView createAuthorView;
   private final FindAuthorView findAuthorView;
   private final EditAuthorView editAuthorView;
+  private final ListDiaryEntryView listDiaryEntryView;
 
-  // Navigation reference
+  // Navigation references
   private MainMenuController mainMenuController;
+  private DiaryController diaryController;
 
   /**
    * Creates a new AuthorController.
    *
-   * @param authorService    the author service
-   * @param view             the author menu view
-   * @param listAuthorView   the list authors view
-   * @param authorView       the author detail view
-   * @param createAuthorView the create author view
-   * @param findAuthorView   the find author view
-   * @param editAuthorView   the edit author view
+   * @param authorService      the author service
+   * @param diaryEntryService  the diary entry service for viewing author entries
+   * @param view               the author menu view
+   * @param listAuthorView     the list authors view
+   * @param authorView         the author detail view
+   * @param createAuthorView   the create author view
+   * @param findAuthorView     the find author view
+   * @param editAuthorView     the edit author view
+   * @param listDiaryEntryView the list diary entries view
    */
-  public AuthorController(AuthorService authorService, AuthorMenuView view,
-      ListAuthorView listAuthorView, AuthorView authorView,
+  public AuthorController(AuthorService authorService, DiaryEntryService diaryEntryService,
+      AuthorMenuView view, ListAuthorView listAuthorView, AuthorView authorView,
       CreateAuthorView createAuthorView, FindAuthorView findAuthorView,
-      EditAuthorView editAuthorView) {
+      EditAuthorView editAuthorView, ListDiaryEntryView listDiaryEntryView) {
     this.authorService = authorService;
+    this.diaryEntryService = diaryEntryService;
     this.view = view;
     this.listAuthorView = listAuthorView;
     this.authorView = authorView;
     this.createAuthorView = createAuthorView;
     this.findAuthorView = findAuthorView;
     this.editAuthorView = editAuthorView;
+    this.listDiaryEntryView = listDiaryEntryView;
   }
 
   /**
@@ -60,6 +70,15 @@ public class AuthorController {
    */
   public void setMainMenuController(MainMenuController mainMenuController) {
     this.mainMenuController = mainMenuController;
+  }
+
+  /**
+   * Sets the diary controller for navigation to entry details.
+   *
+   * @param diaryController the diary controller
+   */
+  public void setDiaryController(DiaryController diaryController) {
+    this.diaryController = diaryController;
   }
 
   /**
@@ -265,14 +284,38 @@ public class AuthorController {
    *
    * @param author          the author whose entries to view
    * @param backDestination where to navigate when returning from author detail
+   * @param in              Scanner for user input
+   * @param out             PrintStream for output
+   * @return the next action to execute
    */
   private Action viewAuthorEntries(Author author, Action backDestination, Scanner in,
       PrintStream out) {
-    // TODO: Implement view entries
-    authorView.showNotImplemented("View entries for " + author.getFullName(), out);
-    authorView.promptContinue(out);
-    in.nextLine();
-    return (in2, out2) -> showAuthorDetail(author, backDestination, in2, out2);
+    List<DiaryEntry> entries = diaryEntryService.findByAuthor(author);
+    listDiaryEntryView.renderAuthorEntries(entries, author.getFullName(), out);
+
+    while (true) {
+      String choice = in.nextLine().trim().toLowerCase();
+
+      if (choice.equals("b")) {
+        return (in2, out2) -> showAuthorDetail(author, backDestination, in2, out2);
+      }
+
+      // Try to parse as number for entry selection
+      try {
+        int index = Integer.parseInt(choice) - 1;
+        if (index >= 0 && index < entries.size()) {
+          DiaryEntry selected = entries.get(index);
+          // Back from entry detail should return to author's entries list
+          return (in2, out2) -> diaryController.showEntryDetail(selected,
+              (in3, out3) -> viewAuthorEntries(author, backDestination, in3, out3), in2, out2);
+        }
+      } catch (NumberFormatException ignored) {
+        // Fall through to error
+      }
+
+      listDiaryEntryView.showError("Invalid selection. Try again.", out);
+      listDiaryEntryView.prompt(out);
+    }
   }
 
   /**

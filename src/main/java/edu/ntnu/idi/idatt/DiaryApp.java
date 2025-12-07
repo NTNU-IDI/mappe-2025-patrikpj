@@ -111,8 +111,9 @@ public class DiaryApp {
     // Controllers
     this.mainMenuController = new MainMenuController(mainMenuView, statisticsService,
         statisticsView);
-    this.authorController = new AuthorController(authorService, authorMenuView,
-        listAuthorView, authorView, createAuthorView, findAuthorView, editAuthorView);
+    this.authorController = new AuthorController(authorService, diaryEntryService, authorMenuView,
+        listAuthorView, authorView, createAuthorView, findAuthorView, editAuthorView,
+        listDiaryEntryView);
     this.diaryController = new DiaryController(diaryEntryService, authorService,
         diaryEntriesView, listDiaryEntryView, diaryEntryView, createDiaryEntryView,
         searchEntriesView, editDiaryEntryView);
@@ -121,6 +122,7 @@ public class DiaryApp {
     mainMenuController.setAuthorController(authorController);
     mainMenuController.setDiaryController(diaryController);
     authorController.setMainMenuController(mainMenuController);
+    authorController.setDiaryController(diaryController);
     diaryController.setMainMenuController(mainMenuController);
 
     // Register shutdown hook for cleanup on Ctrl+C or normal exit

@@ -127,5 +127,34 @@ public class ListDiaryEntryView implements BaseView {
     ConsoleFormatter.dangerItem("b", "Back", out);
     ConsoleFormatter.prompt(out);
   }
+
+  /**
+   * Renders entries by a specific author.
+   *
+   * @param entries    the list of entries by the author
+   * @param authorName the author's name
+   * @param out        the output stream
+   */
+  public void renderAuthorEntries(List<DiaryEntry> entries, String authorName, PrintStream out) {
+    out.println(AnsiColors.CLEAR_SCREEN);
+    ConsoleFormatter.title("Entries by " + authorName, out);
+
+    out.println("Showing " + entries.size() + " entries:");
+    out.println();
+
+    if (entries.isEmpty()) {
+      out.println("No entries found for this author.");
+    } else {
+      int index = 1;
+      for (DiaryEntry entry : entries) {
+        String dateStr = entry.getCreatedAt().format(DATE_FORMAT);
+        String summary = entry.getTitle() + " (" + dateStr + ")";
+        ConsoleFormatter.menuItem(String.valueOf(index++), summary, out);
+      }
+    }
+
+    ConsoleFormatter.dangerItem("b", "Back", out);
+    ConsoleFormatter.prompt(out);
+  }
 }
 
