@@ -3,8 +3,9 @@ package edu.ntnu.idi.idatt.service;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import static edu.ntnu.idi.idatt.model.entities.TestEntityHelper.setAuthorId;
+
 import edu.ntnu.idi.idatt.model.entities.Author;
-import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -30,20 +31,6 @@ class StatisticsServiceTest {
   @BeforeEach
   void setUp() {
     statisticsService = new StatisticsService(authorService, diaryEntryService);
-  }
-
-  /**
-   * Helper method to set the ID field on an Author using reflection.
-   * This is needed because the ID is normally set by the database.
-   */
-  private void setAuthorId(Author author, Long id) {
-    try {
-      Field idField = Author.class.getDeclaredField("id");
-      idField.setAccessible(true);
-      idField.set(author, id);
-    } catch (NoSuchFieldException | IllegalAccessException e) {
-      throw new RuntimeException("Failed to set author ID for testing", e);
-    }
   }
 
   // getTotalAuthors tests
