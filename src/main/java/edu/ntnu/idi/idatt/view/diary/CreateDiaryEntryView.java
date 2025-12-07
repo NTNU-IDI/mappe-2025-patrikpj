@@ -20,6 +20,8 @@ public class CreateDiaryEntryView implements BaseView {
   public void render(PrintStream out) {
     out.println(AnsiColors.CLEAR_SCREEN);
     ConsoleFormatter.title("Create Entry", out);
+
+    // Instructions
     out.println("Enter entry details (leave empty to cancel).");
     out.println();
   }
@@ -42,6 +44,8 @@ public class CreateDiaryEntryView implements BaseView {
   public void showAuthorSelection(List<Author> authors, PrintStream out) {
     out.println(AnsiColors.RESET);
     out.println("Select an author:");
+
+    // List available authors
     int index = 1;
     for (Author author : authors) {
       ConsoleFormatter.menuItem(String.valueOf(index++), author.getFullName(), out);

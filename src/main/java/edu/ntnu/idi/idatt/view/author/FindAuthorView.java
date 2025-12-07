@@ -18,6 +18,8 @@ public class FindAuthorView implements BaseView {
   public void render(PrintStream out) {
     out.println(AnsiColors.CLEAR_SCREEN);
     ConsoleFormatter.title("Find Author", out);
+
+    // Instructions
     out.println("Enter an email to search (leave empty to cancel).");
     out.println();
   }

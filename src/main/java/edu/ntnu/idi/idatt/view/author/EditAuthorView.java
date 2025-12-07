@@ -20,6 +20,8 @@ public class EditAuthorView implements BaseView {
   public void render(Author author, PrintStream out) {
     out.println(AnsiColors.CLEAR_SCREEN);
     ConsoleFormatter.title("Edit Author", out);
+
+    // Current author info
     out.println("Editing: " + ConsoleFormatter.coloredText(author.getFullName(), AnsiColors.BLUE));
     out.println("Leave empty to keep current value.");
     out.println();

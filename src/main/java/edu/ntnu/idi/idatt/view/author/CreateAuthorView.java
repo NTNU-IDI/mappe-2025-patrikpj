@@ -18,6 +18,8 @@ public class CreateAuthorView implements BaseView {
   public void render(PrintStream out) {
     out.println(AnsiColors.CLEAR_SCREEN);
     ConsoleFormatter.title("Create Author", out);
+
+    // Instructions
     out.println("Enter author details (leave empty to cancel).");
     out.println();
   }

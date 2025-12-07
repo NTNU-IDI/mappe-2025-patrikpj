@@ -18,9 +18,13 @@ public class DiaryEntriesView implements BaseView {
   public void renderMenu(PrintStream out) {
     out.println(AnsiColors.CLEAR_SCREEN);
     ConsoleFormatter.title("Diary Entries Menu", out);
+
+    // Menu options
     ConsoleFormatter.menuItem("1", "List All Entries", out);
     ConsoleFormatter.menuItem("2", "Create Entry", out);
     ConsoleFormatter.menuItem("3", "Search Entries [...]", out);
+
+    // Navigation
     ConsoleFormatter.dangerItem("b", "Back", out);
     ConsoleFormatter.prompt(out);
   }

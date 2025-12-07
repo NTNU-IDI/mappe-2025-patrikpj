@@ -20,6 +20,8 @@ public class EditDiaryEntryView implements BaseView {
   public void render(DiaryEntry entry, PrintStream out) {
     out.println(AnsiColors.CLEAR_SCREEN);
     ConsoleFormatter.title("Edit Entry", out);
+
+    // Current entry info
     out.println("Editing: " + ConsoleFormatter.coloredText(entry.getTitle(), AnsiColors.BLUE));
     out.println("By: " + entry.getAuthor().getFullName());
     out.println();

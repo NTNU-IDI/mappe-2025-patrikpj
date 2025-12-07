@@ -28,6 +28,7 @@ public class ListDiaryEntryView implements BaseView {
     out.println("Showing " + entries.size() + " entries, choose one to view details:");
     out.println();
 
+    // List entries or show empty message
     if (entries.isEmpty()) {
       out.println("No entries found.");
     } else {
@@ -41,6 +42,7 @@ public class ListDiaryEntryView implements BaseView {
       }
     }
 
+    // Navigation
     ConsoleFormatter.dangerItem("b", "Back", out);
     ConsoleFormatter.prompt(out);
   }
@@ -59,6 +61,7 @@ public class ListDiaryEntryView implements BaseView {
     out.println("Found " + entries.size() + " entries matching \"" + keyword + "\":");
     out.println();
 
+    // List matching entries
     int index = 1;
     for (DiaryEntry entry : entries) {
       String dateStr = entry.getCreatedAt().format(DATE_FORMAT);
@@ -68,6 +71,7 @@ public class ListDiaryEntryView implements BaseView {
       ConsoleFormatter.menuItem(String.valueOf(index++), summary, out);
     }
 
+    // Navigation
     ConsoleFormatter.dangerItem("b", "Back", out);
     ConsoleFormatter.prompt(out);
   }
@@ -86,6 +90,7 @@ public class ListDiaryEntryView implements BaseView {
     out.println("Found " + entries.size() + " entries from " + dateStr + ":");
     out.println();
 
+    // List matching entries
     int index = 1;
     for (DiaryEntry entry : entries) {
       String timeStr = entry.getCreatedAt().format(DATE_FORMAT);
@@ -95,6 +100,7 @@ public class ListDiaryEntryView implements BaseView {
       ConsoleFormatter.menuItem(String.valueOf(index++), summary, out);
     }
 
+    // Navigation
     ConsoleFormatter.dangerItem("b", "Back", out);
     ConsoleFormatter.prompt(out);
   }
@@ -116,6 +122,7 @@ public class ListDiaryEntryView implements BaseView {
         "Found " + entries.size() + " entries between " + startStr + " and " + endStr + ":");
     out.println();
 
+    // List matching entries
     int index = 1;
     for (DiaryEntry entry : entries) {
       String timeStr = entry.getCreatedAt().format(DATE_FORMAT);
@@ -125,6 +132,7 @@ public class ListDiaryEntryView implements BaseView {
       ConsoleFormatter.menuItem(String.valueOf(index++), summary, out);
     }
 
+    // Navigation
     ConsoleFormatter.dangerItem("b", "Back", out);
     ConsoleFormatter.prompt(out);
   }
@@ -143,6 +151,7 @@ public class ListDiaryEntryView implements BaseView {
     out.println("Showing " + entries.size() + " entries:");
     out.println();
 
+    // List entries or show empty message
     if (entries.isEmpty()) {
       out.println("No entries found for this author.");
     } else {
@@ -154,6 +163,7 @@ public class ListDiaryEntryView implements BaseView {
       }
     }
 
+    // Navigation
     ConsoleFormatter.dangerItem("b", "Back", out);
     ConsoleFormatter.prompt(out);
   }

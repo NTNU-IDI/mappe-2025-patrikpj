@@ -24,6 +24,8 @@ public class ListAuthorView implements BaseView {
 
     out.println("Showing " + authors.size() + " authors, choose one to view details / edit:");
     out.println();
+
+    // List authors or show empty message
     if (authors.isEmpty()) {
       out.println("No authors found.");
     } else {
@@ -33,6 +35,7 @@ public class ListAuthorView implements BaseView {
       }
     }
 
+    // Navigation
     ConsoleFormatter.dangerItem("b", "Back", out);
     ConsoleFormatter.prompt(out);
   }

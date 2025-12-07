@@ -18,11 +18,17 @@ public class MainMenuView implements BaseView {
    */
   public void renderMenu(PrintStream out) {
     out.println(AnsiColors.CLEAR_SCREEN);
+
+    // Application banner
     out.println(DiarySystemBanner.getColoredBanner());
     ConsoleFormatter.title("Main Menu", out);
+
+    // Menu options
     ConsoleFormatter.menuItem("1", "Diary Entries [...]", out);
     ConsoleFormatter.menuItem("2", "Author [...]", out);
     ConsoleFormatter.menuItem("3", "Statistics", out);
+
+    // Exit option
     ConsoleFormatter.dangerItem("q", "Quit", out);
     ConsoleFormatter.prompt(out);
   }

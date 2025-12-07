@@ -21,6 +21,7 @@ public class AuthorView implements BaseView {
     out.println(AnsiColors.CLEAR_SCREEN);
     ConsoleFormatter.title("Author Details", out);
 
+    // Author information
     out.println("Name: " + ConsoleFormatter.coloredText(author.getFullName(), AnsiColors.BLUE));
     out.println("Email: " + ConsoleFormatter.coloredText(author.getEmail(), AnsiColors.BLUE));
     out.println("Created At: " + ConsoleFormatter.coloredText(author.getCreatedAt().toString(),
@@ -28,6 +29,8 @@ public class AuthorView implements BaseView {
     out.println("Updated At: " + ConsoleFormatter.coloredText(author.getUpdatedAt().toString(),
         AnsiColors.BLUE));
     out.println();
+
+    // Actions menu
     ConsoleFormatter.menuItem("1", "View Entries", out);
     ConsoleFormatter.menuItem("2", "Edit Info", out);
     ConsoleFormatter.dangerItem("3", ConsoleFormatter.coloredText("Delete", AnsiColors.RED), out);

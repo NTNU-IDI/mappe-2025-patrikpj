@@ -18,9 +18,13 @@ public class SearchEntriesView implements BaseView {
   public void renderMenu(PrintStream out) {
     out.println(AnsiColors.CLEAR_SCREEN);
     ConsoleFormatter.title("Search Entries", out);
+
+    // Search options
     ConsoleFormatter.menuItem("1", "Search by keyword", out);
     ConsoleFormatter.menuItem("2", "Search by date", out);
     ConsoleFormatter.menuItem("3", "Search by date range", out);
+
+    // Navigation
     ConsoleFormatter.dangerItem("b", "Back", out);
     ConsoleFormatter.prompt(out);
   }
@@ -33,6 +37,8 @@ public class SearchEntriesView implements BaseView {
   public void renderKeywordSearch(PrintStream out) {
     out.println(AnsiColors.CLEAR_SCREEN);
     ConsoleFormatter.title("Search by Keyword", out);
+
+    // Instructions
     out.println("Enter a keyword to search in titles and content.");
     out.println("Leave empty to cancel.");
     out.println();
@@ -79,6 +85,8 @@ public class SearchEntriesView implements BaseView {
   public void renderDateSearch(PrintStream out) {
     out.println(AnsiColors.CLEAR_SCREEN);
     ConsoleFormatter.title("Search by Date", out);
+
+    // Instructions
     out.println("Enter a date to find entries from that day.");
     out.println("Format: DD-MM-YYYY (e.g. 05-12-2025)");
     out.println("Leave empty to cancel.");
@@ -123,6 +131,8 @@ public class SearchEntriesView implements BaseView {
   public void renderDateRangeSearch(PrintStream out) {
     out.println(AnsiColors.CLEAR_SCREEN);
     ConsoleFormatter.title("Search by Date Range", out);
+
+    // Instructions
     out.println("Enter a date range to find entries.");
     out.println("Format: DD-MM-YYYY (e.g. 01-12-2025)");
     out.println("Leave empty to cancel.");
