@@ -125,7 +125,7 @@ public class DiaryApp {
     authorController.setDiaryController(diaryController);
     diaryController.setMainMenuController(mainMenuController);
 
-    // Register shutdown hook for cleanup on Ctrl+C or normal exit
+    // Register shutdown hook for cleanup on Ctrl+C
     Runtime.getRuntime().addShutdownHook(new Thread(this::cleanup));
   }
 
@@ -140,15 +140,19 @@ public class DiaryApp {
     // Router runs the Action-based TUI loop
     Router router = new Router(initialAction, scanner, out);
     router.run();
+
+    // Clean up resources after user exits
+    cleanup();
   }
 
   /**
    * Cleans up resources before exit. This is called from the shutdown hook and can also be called
-   * manually.
+   * manually. Safe to call multiple times.
    */
-  private void cleanup() {
+  private synchronized void cleanup() {
     if (scanner != null) {
       scanner.close();
+      scanner = null;
     }
     HibernateUtil.shutdown();
   }

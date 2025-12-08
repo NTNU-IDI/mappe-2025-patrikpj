@@ -53,10 +53,10 @@ public final class HibernateUtil {
   }
 
   /**
-   * Closes the SessionFactory and releases all resources.
+   * Closes the SessionFactory and releases all resources. Safe to call multiple times.
    */
-  public static void shutdown() {
-    if (SESSION_FACTORY != null) {
+  public static synchronized void shutdown() {
+    if (SESSION_FACTORY != null && !SESSION_FACTORY.isClosed()) {
       SESSION_FACTORY.close();
     }
   }
