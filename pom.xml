@@ -86,6 +86,15 @@
           <argLine>-XX:+EnableDynamicAgentLoading</argLine>
         </configuration>
       </plugin>
+      <!-- Maven Exec Plugin for running the application -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>3.1.0</version>
+        <configuration>
+          <mainClass>edu.ntnu.idi.idatt.Main</mainClass>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 
