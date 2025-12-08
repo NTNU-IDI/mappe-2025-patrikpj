@@ -95,12 +95,13 @@ class StatisticsServiceTest {
     @DisplayName("should return empty map when no authors exist")
     void shouldReturnEmptyMapWhenNoAuthorsExist() {
       when(authorService.findAll()).thenReturn(Collections.emptyList());
+      when(diaryEntryService.countEntriesGroupedByAuthor()).thenReturn(Collections.emptyMap());
 
       Map<Author, Long> result = statisticsService.getEntriesPerAuthor();
 
       assertTrue(result.isEmpty());
       verify(authorService).findAll();
-      verifyNoInteractions(diaryEntryService);
+      verify(diaryEntryService).countEntriesGroupedByAuthor();
     }
 
     @Test
@@ -110,13 +111,13 @@ class StatisticsServiceTest {
       setAuthorId(author, 1L);
       
       when(authorService.findAll()).thenReturn(List.of(author));
-      when(diaryEntryService.countByAuthorId(1L)).thenReturn(0L);
+      when(diaryEntryService.countEntriesGroupedByAuthor()).thenReturn(Collections.emptyMap());
 
       Map<Author, Long> result = statisticsService.getEntriesPerAuthor();
 
       assertEquals(1, result.size());
       assertEquals(0L, result.get(author));
-      verify(diaryEntryService).countByAuthorId(1L);
+      verify(diaryEntryService).countEntriesGroupedByAuthor();
     }
 
     @Test
@@ -128,8 +129,7 @@ class StatisticsServiceTest {
       setAuthorId(author2, 2L);
       
       when(authorService.findAll()).thenReturn(List.of(author1, author2));
-      when(diaryEntryService.countByAuthorId(1L)).thenReturn(3L);
-      when(diaryEntryService.countByAuthorId(2L)).thenReturn(1L);
+      when(diaryEntryService.countEntriesGroupedByAuthor()).thenReturn(Map.of(1L, 3L, 2L, 1L));
 
       Map<Author, Long> result = statisticsService.getEntriesPerAuthor();
 
@@ -139,8 +139,8 @@ class StatisticsServiceTest {
     }
 
     @Test
-    @DisplayName("should call countByAuthorId for each author")
-    void shouldCallCountByAuthorIdForEachAuthor() {
+    @DisplayName("should use single query for efficiency")
+    void shouldUseSingleQueryForEfficiency() {
       Author author1 = new Author("John", "Doe", "john@example.com");
       Author author2 = new Author("Jane", "Smith", "jane@example.com");
       Author author3 = new Author("Bob", "Wilson", "bob@example.com");
@@ -149,14 +149,12 @@ class StatisticsServiceTest {
       setAuthorId(author3, 3L);
       
       when(authorService.findAll()).thenReturn(List.of(author1, author2, author3));
-      when(diaryEntryService.countByAuthorId(anyLong())).thenReturn(0L);
+      when(diaryEntryService.countEntriesGroupedByAuthor()).thenReturn(Map.of(1L, 5L, 2L, 3L, 3L, 1L));
 
       statisticsService.getEntriesPerAuthor();
 
-      verify(diaryEntryService).countByAuthorId(1L);
-      verify(diaryEntryService).countByAuthorId(2L);
-      verify(diaryEntryService).countByAuthorId(3L);
-      verify(diaryEntryService, times(3)).countByAuthorId(anyLong());
+      // Verify single query is used instead of N queries
+      verify(diaryEntryService, times(1)).countEntriesGroupedByAuthor();
     }
   }
 }
