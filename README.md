@@ -10,31 +10,79 @@ A command-line diary application where the user can create and manage authors an
 
 
 ## Project structure
-The project follows an MVC architecture with clear separation of concerns. Source files are organized in `src/main/java/edu/ntnu/idi/idatt/` with the following packages:
+The project follows an MVC architecture with a clear separation of concerns. Source files are organized in `src/main/java/edu/ntnu/idi/idatt/` with the following packages:
 
-- **`controller/`** - Handles user input and coordinates between services and views
-- **`service/`** - Contains business logic and validation
-- **`repository/`** - Data access layer for database operations
-- **`model/entities/`** - Domain entities (Author, DiaryEntry)
-- **`view/components/`** - Reusable UI components (MenuView, Paginator, AnsiColors)
-- **`util/`** - Utility classes (HibernateUtil)
+| Package | Description |
+|---------|-------------|
+| `controller/` | Handles user input and coordinates between services and views |
+| `service/` | Contains business logic and validation |
+| `repository/` | Data access layer for database operations |
+| `model/entities/` | Domain entities (Author, DiaryEntry) |
+| `view/` | UI views organized by feature (author, diary, mainmenu, statistics) |
+| `view/_components/` | Reusable UI components (MenuView, Paginator, AnsiColors) |
+| `util/` | Utility classes (HibernateUtil) |
+
+
+The sourcefiles are organized as follows:
+
+```
+├───java
+│   └───edu
+│       └───ntnu
+│           └───idi
+│               └───idatt
+│                   ├───controller
+│                   ├───model
+│                   │   └───entities
+│                   ├───repository
+│                   ├───service
+│                   ├───util
+│                   └───view
+│                       ├───author
+│                       ├───diary
+│                       ├───mainmenu
+│                       ├───statistics
+│                       └───_components
+└───resources
+```
 
 Test classes go in `src/test/java/` following the same package structure.
 
 Configuration files are in `src/main/resources/` (Hibernate config, logging properties).
-
 
 ## Link to repository
 https://github.com/NTNU-IDI/mappe-2025-patrikpj
 
 
 ## How to run the project
-[//]: # (TODO: Describe how to run your project here. What is the main class? What is the main method?
-What is the input and output of the program? What is the expected behaviour of the program?)
+
+> **Note:** All commands should be run from the root of the project.
+
+**Windows users:**
+```powershell
+.\scripts\run.ps1
+```
+
+**Other platforms (or manually):**
+```bash
+mvn compile exec:java
+```
+
+The application starts a command-line interface where you can navigate through menus to manage authors and diary entries. Use the number keys to select menu options.
 
 
 ## How to run the tests
-[//]: # (TODO: Describe how to run the tests here.)
+> **Note:** All commands should be run from the root of the project.
+
+**Windows users:**
+```powershell
+.\scripts\test.ps1
+```
+
+**Other platforms (or manually):**
+```bash
+mvn test
+```
 
 
 ## References
