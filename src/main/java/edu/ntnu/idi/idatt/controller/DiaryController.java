@@ -88,13 +88,13 @@ public class DiaryController {
 
       switch (choice) {
         case "1" -> {
-          return (in2, out2) -> listAllEntries(in2, out2);
+          return (in2, out2) -> showEntriesList(in2, out2);
         }
         case "2" -> {
-          return (in2, out2) -> createEntry(in2, out2);
+          return (in2, out2) -> showCreateEntry(in2, out2);
         }
         case "3" -> {
-          return (in2, out2) -> searchEntries(in2, out2);
+          return (in2, out2) -> showSearchEntries(in2, out2);
         }
         case "b" -> {
           return (in2, out2) -> mainMenuController.showMenu(in2, out2);
@@ -108,13 +108,13 @@ public class DiaryController {
   }
 
   /**
-   * Lists all diary entries.
+   * Shows the list of all diary entries.
    *
    * @param in  Scanner for user input
    * @param out PrintStream for output
    * @return the next action to execute
    */
-  public Action listAllEntries(Scanner in, PrintStream out) {
+  public Action showEntriesList(Scanner in, PrintStream out) {
     List<DiaryEntry> entries = diaryEntryService.findAll();
     listEntryView.render(entries, out);
 
@@ -131,7 +131,7 @@ public class DiaryController {
         if (index >= 0 && index < entries.size()) {
           DiaryEntry selected = entries.get(index);
           // Back from detail should return to list
-          return (in2, out2) -> showEntryDetail(selected, this::listAllEntries, in2, out2);
+          return (in2, out2) -> showEntryDetail(selected, this::showEntriesList, in2, out2);
         }
       } catch (NumberFormatException ignored) {
         // Fall through to error
@@ -149,7 +149,7 @@ public class DiaryController {
    * @param out PrintStream for output
    * @return the next action to execute
    */
-  public Action createEntry(Scanner in, PrintStream out) {
+  public Action showCreateEntry(Scanner in, PrintStream out) {
     createEntryView.render(out);
 
     // Check if any authors exist
@@ -224,13 +224,13 @@ public class DiaryController {
   }
 
   /**
-   * Shows the search entries form.
+   * Shows the search entries menu.
    *
    * @param in  Scanner for user input
    * @param out PrintStream for output
    * @return the next action to execute
    */
-  public Action searchEntries(Scanner in, PrintStream out) {
+  public Action showSearchEntries(Scanner in, PrintStream out) {
     searchEntriesView.renderMenu(out);
 
     while (true) {
@@ -270,7 +270,7 @@ public class DiaryController {
     String keyword = in.nextLine().trim();
 
     if (keyword.isBlank()) {
-      return this::searchEntries;
+      return this::showSearchEntries;
     }
 
     List<DiaryEntry> results = diaryEntryService.search(keyword);
@@ -279,7 +279,7 @@ public class DiaryController {
       searchEntriesView.showNoResults(keyword, out);
       searchEntriesView.promptContinue(out);
       in.nextLine();
-      return this::searchEntries;
+      return this::showSearchEntries;
     }
 
     // Show results
@@ -303,7 +303,7 @@ public class DiaryController {
       String choice = in.nextLine().trim().toLowerCase();
 
       if (choice.equals("b")) {
-        return this::searchEntries;
+        return this::showSearchEntries;
       }
 
       // Try to parse as number for entry selection
@@ -345,7 +345,7 @@ public class DiaryController {
       String input = in.nextLine().trim();
 
       if (input.isBlank()) {
-        return this::searchEntries;
+        return this::showSearchEntries;
       }
 
       // Parse the date
@@ -363,7 +363,7 @@ public class DiaryController {
         searchEntriesView.showNoResultsForDate(input, out);
         searchEntriesView.promptContinue(out);
         in.nextLine();
-        return this::searchEntries;
+        return this::showSearchEntries;
       }
 
       // Show results
@@ -388,7 +388,7 @@ public class DiaryController {
       String choice = in.nextLine().trim().toLowerCase();
 
       if (choice.equals("b")) {
-        return this::searchEntries;
+        return this::showSearchEntries;
       }
 
       // Try to parse as number for entry selection
@@ -426,7 +426,7 @@ public class DiaryController {
       startStr = in.nextLine().trim();
 
       if (startStr.isBlank()) {
-        return this::searchEntries;
+        return this::showSearchEntries;
       }
 
       try {
@@ -445,7 +445,7 @@ public class DiaryController {
       endStr = in.nextLine().trim();
 
       if (endStr.isBlank()) {
-        return this::searchEntries;
+        return this::showSearchEntries;
       }
 
       try {
@@ -469,7 +469,7 @@ public class DiaryController {
       searchEntriesView.showNoResultsForDateRange(startStr, endStr, out);
       searchEntriesView.promptContinue(out);
       in.nextLine();
-      return this::searchEntries;
+      return this::showSearchEntries;
     }
 
     // Capture final values for lambda
@@ -496,7 +496,7 @@ public class DiaryController {
       String choice = in.nextLine().trim().toLowerCase();
 
       if (choice.equals("b")) {
-        return this::searchEntries;
+        return this::showSearchEntries;
       }
 
       // Try to parse as number for entry selection
