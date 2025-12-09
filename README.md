@@ -86,5 +86,22 @@ mvn test
 
 
 ## References
-[//]: # (TODO: Include references here, if any. For example, if you have used code from the course book, include a reference to the chapter.
-Or if you have used code from a website or other source, include a link to the source.)
+> References copied from the report.
+
+1. C. S. Horstmann, *Core Java Volume 1: Fundamentals*, 11th edition, Addison-Wesley, 2018.
+
+2. w3schools, "Java OOP," Online: https://www.w3schools.com/java/java_oop.asp  
+   Accessed 20 November 2025.
+
+3. Mozilla, "MVC - Glossary," Online: https://developer.mozilla.org/en-US/docs/Glossary/MVC  
+   Accessed 20 November 2025.
+
+4. R. Awati, 2023. Online: https://www.techtarget.com/searchsoftwarequality/definition/iterative-development  
+   Accessed 25 November 2025.
+
+5. Fortinet, "What Is Defense In Depth?," Online: https://www.fortinet.com/resources/cyberglossary/defense-in-depth  
+   Accessed 20 November 2025.
+
+6. GeeksforGeeks, "MVC Design Pattern," Online:  
+   https://www.geeksforgeeks.org/system-design/mvc-design-pattern/  
+   Accessed 20 November 2025.
